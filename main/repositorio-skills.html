@@ -273,7 +273,7 @@ button.me-av:hover{box-shadow:0 0 0 2px rgba(255,255,255,.6)}
   padding:8px 17px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-btn);transition:background .15s}
 .btn-p:hover{background:var(--hdr-mid)}
 .btn-p.go{background:var(--green-ok)}.btn-p.go:hover{background:#009243}
-.btn-p.warn{background:var(--accent1)}.btn-p.warn:hover{background:#CF7C0D}
+.btn-p.warn{background:var(--accent1)}.btn-p.del{background:var(--accent3)}.btn-p.del:hover{background:#600000}.btn-p.warn:hover{background:#CF7C0D}
 .btn-s{display:inline-flex;align-items:center;gap:5px;background:transparent;color:var(--g-text2);border:1px solid var(--g-border);
   border-radius:3px;padding:8px 15px;font-size:12.5px;cursor:pointer;transition:all .15s}
 .btn-s:hover{border-color:var(--hdr-mid);color:var(--hdr-bg);background:var(--blue-l)}
@@ -482,8 +482,9 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
           <input type="text" id="i-d" placeholder="Ex: Classificador de fornecedores" maxlength="90">
           <div class="hint">Como o pessoal vai procurar por ela no repositório.</div></div>
         <div class="fi"><label>Responsável (owner)</label>
-          <input type="text" id="i-r" readonly tabindex="-1" style="background:var(--g-surface2);color:var(--g-text2)">
-          <div class="hint">Quem cadastrou ou teve a última versão aprovada. Para trocar suas iniciais, clique nelas no topo.</div></div>
+          <input type="text" id="i-r" readonly tabindex="-1" list="dl-pessoas" autocomplete="off" style="background:var(--g-surface2);color:var(--g-text2)">
+          <datalist id="dl-pessoas"></datalist>
+          <div class="hint" id="i-r-hint">Quem cadastrou ou teve a última versão aprovada. Para trocar suas iniciais, clique nelas no topo.</div></div>
       </div>
       <div class="frow c4">
         <div class="fi"><label>Categoria <span class="rq">*</span></label><select id="i-c"></select>
@@ -1682,7 +1683,7 @@ function abrirNovaVersao(id){
   document.getElementById('f-ver').style.display='block';
   const nt=document.getElementById('i-notas'); nt.classList.remove('bad'); nt.value = rascunho ? p.notas : '';
   ARQ_SEL = rascunho ? (p.arquivo||null) : null; pintarArquivoSel();
-  FORM_MODO='versao'; pintarBlocoArquivo(); limparImportacao();
+  FORM_MODO='versao'; pintarBlocoArquivo(); limparImportacao(); prepararOwner(x);
   const req=aprovacoesNecessarias(x, USUARIO), prox=x.versao+1;
   document.getElementById('f-t').textContent='Nova versão — '+x.d;
   document.getElementById('f-s').innerHTML='Versão atual <b>v'+x.versao+'</b> · a sua será a <b>v'+prox+'</b>';
@@ -1947,9 +1948,26 @@ function fichaFooter(x){
   let ft = (linkExterno(x) ? btnAcessar(x,'btn-p') : '<button class="btn-p" onclick="baixarMd('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar ficha .md</button>')
          + '<button class="btn-s" onclick="prevMd('+x.id+')" id="btn-prev">Ver conteúdo do .md</button>'
          + (x.status==='aprovada' && !emAnalise ? '<button class="btn-s" onclick="abrirNovaVersao('+x.id+')"><svg class="gi"><use href="#i-ul"/></svg> Subir nova versão</button>' : '')
-         + (podeEditar?'<button class="btn-s" onclick="editar('+x.id+')">Editar ficha</button>':'');
+         + (podeEditar?'<button class="btn-s" onclick="editar('+x.id+')">Editar ficha</button>':'')
+         + (isAdmin()?'<button class="btn-s no" onclick="pedirExclusao('+x.id+')"><svg class="gi"><use href="#i-x"/></svg> Excluir skill</button>':'');
   ft += '<span class="sp">skill_'+htm(x.slug)+'.md'+(x.versao?' · v'+x.versao:'')+'</span>';
   return ft;
+}
+/* excluir: só admin, com confirmação no próprio rodapé. A sincronização apaga o registro no PPR;
+   o conteúdo publicado no repositório privado do GitHub continua lá como histórico. */
+function pedirExclusao(id){
+  const x=byId(id); if(!x || !isAdmin()) return;
+  document.getElementById('d-f').innerHTML =
+      '<span style="font-size:12.5px;color:var(--accent3);margin-right:auto"><b>Excluir “'+htm(x.d)+'”?</b> A skill some do repositório para todos, com histórico e avaliações.</span>'
+    + '<button class="btn-p del" onclick="excluirSkill('+x.id+')">Confirmar exclusão</button>'
+    + '<button class="btn-s" onclick="cancelarExclusao('+x.id+')">Cancelar</button>';
+}
+function cancelarExclusao(id){ const x=byId(id); if(x) document.getElementById('d-f').innerHTML=fichaFooter(x); }
+function excluirSkill(id){
+  const x=byId(id); if(!x || !isAdmin()) return;
+  ITENS=ITENS.filter(i=>i.id!==id);
+  fechar('m-det'); montarChips(); render();
+  toast('<b>'+htm(x.d)+'</b> excluída do repositório.','ok');
 }
 function histHTML(x){
   const hs=(x.historico||[]).slice().sort((a,b)=>b.versao-a.versao);
@@ -2043,6 +2061,34 @@ function selOpts(id,vals){
 }
 const CAMPOS=[['i-d','d'],['i-r','r'],['i-c','c'],['i-f','f'],['i-t','t'],['i-m','m'],['i-e','e'],['i-amp','amp'],['i-hr','hr'],['i-q','q'],
               ['i-esc','esc'],['i-in','inp'],['i-out','out'],['i-uso','uso'],['i-ex','ex'],['i-com','com'],['i-link','link'],['i-repo','repo'],['i-obs','obs']];
+/* owner (Resp.): o admin atribui a autoria a outra pessoa pelo e-mail; os demais só veem */
+const HINT_OWNER = 'Quem cadastrou ou teve a última versão aprovada. Para trocar suas iniciais, clique nelas no topo.';
+function prepararOwner(x){
+  const el=document.getElementById('i-r'), hint=document.getElementById('i-r-hint');
+  const pode=isAdmin() && FORM_MODO!=='versao';
+  el.readOnly=!pode; el.tabIndex=pode?0:-1;
+  el.style.background=pode?'':'var(--g-surface2)'; el.style.color=pode?'':'var(--g-text2)';
+  if(!pode){ hint.textContent=HINT_OWNER; return; }
+  const o = x ? (x.owner||{}) : pessoaAtual();
+  el.value = o.email || o.iniciais || '';
+  const emails=new Map();
+  diretorio().forEach(p=>{ if(p.email) emails.set(p.email.toLowerCase(), p.nome||p.email); });
+  ITENS.forEach(i=>{ const e=((i.owner||{}).email||'').toLowerCase(); if(e && !emails.has(e)) emails.set(e, e); });
+  document.getElementById('dl-pessoas').innerHTML=[...emails].sort((a,b)=>a[1].localeCompare(b[1]))
+    .map(([e,n])=>'<option value="'+htm(e)+'">'+htm(n)+'</option>').join('');
+  hint.innerHTML='<b>Admin:</b> digite ou escolha o e-mail de quem fica como owner (Resp.) da skill. Vale também para quem ainda não abriu a ferramenta.';
+}
+/* null = sem mudança; false = inválido (erro já exibido); objeto = novo owner */
+function ownerDoForm(){
+  if(!isAdmin() || FORM_MODO==='versao') return null;
+  const el=document.getElementById('i-r'), v=el.value.trim().toLowerCase();
+  const atual = EDIT_ID!==null ? (byId(EDIT_ID).owner||{}) : pessoaAtual();
+  const falha=m=>{ const err=document.getElementById('f-err'); err.className='ferr show'; err.innerHTML=m; el.classList.add('bad'); return false; };
+  if(!v) return falha('Informe o e-mail do owner (Resp.) da skill.');
+  if(v===(atual.email||'').toLowerCase() || (!atual.email && normIni(v)===normIni(atual.iniciais))) return null;
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) return falha('Use o e-mail da pessoa no owner (ex.: nome.sobrenome@gradusconsultoria.com.br).');
+  return {email:v, iniciais:iniciaisDe(v, iniciaisSugeridas('', v))};
+}
 function abrirForm(){
   EDIT_ID=null; VER_ID=null; document.getElementById('f-ver').style.display='none';
   selOpts('i-t',OPC_TIPO); selOpts('i-m',ORD_MET); selCats(); selFontes();
@@ -2051,7 +2097,7 @@ function abrirForm(){
   document.getElementById('i-r').value=USUARIO.iniciais;
   document.getElementById('i-e').value='WIP';
   document.getElementById('i-f').value='cons';
-  FORM_MODO='novo'; ARQ_SEL=null; pintarArquivoSel(); pintarBlocoArquivo(); limparImportacao();
+  FORM_MODO='novo'; ARQ_SEL=null; pintarArquivoSel(); pintarBlocoArquivo(); limparImportacao(); prepararOwner(null);
   document.getElementById('f-t').textContent='Adicionar skill ao repositório';
   document.getElementById('f-s').innerHTML='Preencha o que já souber — o que faltar entra na ficha como pendência do responsável';
   document.getElementById('f-note').className='fnote';
@@ -2070,13 +2116,14 @@ function editar(id){
   selOpts('i-t',OPC_TIPO); selOpts('i-m',ORD_MET); selCats(); selFontes(x.f);
   CAMPOS.forEach(([cid,k])=>{ const el=document.getElementById(cid); el.classList.remove('bad','imp');
     el.value = (x[k]===null||x[k]===undefined)?'':x[k]; });
-  FORM_MODO = x.status==='aprovada' ? 'editar-pub' : 'editar-pend';
+  FORM_MODO = x.status==='aprovada' ? 'editar-pub' : 'editar-pend'; prepararOwner(x);
   ARQ_SEL = x.status!=='aprovada' ? (x.arquivoNovo||null) : null; pintarArquivoSel(); pintarBlocoArquivo(); limparImportacao();
   document.getElementById('f-t').textContent='Editar ficha — '+x.d;
   document.getElementById('f-s').innerHTML='Completando o que estava pendente na ficha';
   document.getElementById('f-note').className='fnote';
   document.getElementById('f-note').innerHTML = x.status==='aprovada'
-    ? '<strong>Skill já publicada:</strong> as alterações valem na hora para todos. Ajuste do admin: não gera versão nova e não muda o owner.'
+    ? '<strong>Skill já publicada:</strong> as alterações valem na hora para todos. Ajuste do admin: não gera versão nova'
+      + (isAdmin() ? '; o owner só muda se você trocar o e-mail no campo Responsável.' : ' e não muda o owner.')
     : '<strong>Sugestão pendente:</strong> ao salvar, ela volta para a fila de aprovação'+(x.status==='recusada'?' e o motivo da recusa anterior é apagado.':'.');
   document.getElementById('f-err').className='ferr';
   const alvo = x.status==='aprovada' ? 'aprovada' : 'pendente';
@@ -2132,12 +2179,14 @@ function pintarBlocoArquivo(){
 }
 function salvar(status){
   if(!validarForm(null, EDIT_ID===null || byId(EDIT_ID).status!=='aprovada')) return;
+  const dono=ownerDoForm(); if(dono===false) return;
   const dados=lerForm(), eu=pessoaAtual();
   /* INTEGRAÇÃO: repetir esta regra no backend — só admin define ORG */
   if(!isAdmin() && dados.f==='org' && !(EDIT_ID!==null && byId(EDIT_ID).f==='org')) dados.f='cons';
   if(EDIT_ID!==null){
     const x=byId(EDIT_ID);
     Object.assign(x,dados);
+    if(dono) x.owner=dono;   /* admin atribuiu a autoria a outra pessoa */
     if(ARQ_SEL && !x.versao) x.arquivoNovo=ARQ_SEL;   /* ainda não publicada: troca o arquivo enviado */
     x.status=status; if(status!=='recusada') x.motivo='';
     x.ultMod=Object.assign({},eu,{data:hoje()});   /* ajuste direto: não gera versão nem muda o owner */
@@ -2148,7 +2197,7 @@ function salvar(status){
     return;
   }
   /* skill nova: quem cadastra é o criador e o primeiro owner */
-  const it=mkItem(Object.assign({owner:eu},dados),status,eu.iniciais);
+  const it=mkItem(Object.assign({owner:dono||eu}, dono?{criador:Object.assign({},eu,{data:hoje()})}:{}, dados),status,eu.iniciais);
   it.id=novoId(); it.autorEmail=eu.email; it.origem='novo'; it.arquivoNovo=ARQ_SEL;
   if(status==='aprovada') iniciarHistorico(it,'Versão inicial');
   ITENS.push(it);

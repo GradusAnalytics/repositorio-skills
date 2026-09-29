@@ -896,7 +896,13 @@ function iniciaisSugeridas(nome, email){
 }
 /* Diretório de pessoas (email -> nome e iniciais).
    INTEGRAÇÃO: vir do cadastro de usuários da aplicação (inclui as iniciais escolhidas por cada um). */
-function diretorio(){ return MODO_DEMO ? USUARIOS_DEMO : (window.GRADUS_USUARIO ? [window.GRADUS_USUARIO] : []); }
+let PESSOAS = [];   /* quem já abriu a ferramenta pelo PPR: [{email, nome, iniciais}] (coleção meu_pessoas) */
+function diretorio(){
+  if(MODO_DEMO) return USUARIOS_DEMO;
+  const g=window.GRADUS_USUARIO, l=PESSOAS.slice();
+  if(g && !l.some(p=>p.email===g.email)) l.push(g);
+  return l;
+}
 function iniciaisDe(email, fallback){
   email=String(email||'').toLowerCase();
   if(email && INI_PREF[email]) return INI_PREF[email];
@@ -944,7 +950,10 @@ function salvarIniciais(){
   INI_PREF[USUARIO.email]=novo; gravarIniciais(); aplicarIniciais();
 }
 function usarIniciaisPadrao(){ delete INI_PREF[USUARIO.email]; gravarIniciais(); aplicarIniciais(); }
-function gravarIniciais(){ try{ localStorage.setItem(CHAVE_INICIAIS, JSON.stringify(INI_PREF)); }catch(e){} }
+function gravarIniciais(){
+  try{ localStorage.setItem(CHAVE_INICIAIS, JSON.stringify(INI_PREF)); }catch(e){}
+  if(DADOS_ON && USUARIO) gravarPessoa().catch(()=>{});
+}
 function aplicarIniciais(){
   carregarUsuario();
   ITENS.forEach(x=>{ [x.owner,x.criador,x.ultMod].forEach(p=>{ if(p && p.email===USUARIO.email) p.iniciais=USUARIO.iniciais; }); derivar(x); });
@@ -1259,7 +1268,7 @@ function render(){
 /* ── avaliações: 1 a 5 estrelas, média simples, uma nota por usuário ── */
 /* Cada skill guarda avaliacoes: [{email, nota, data}]. Avaliar de novo substitui a nota anterior. */
 const NOTA_LBL = {1:'Ruim',2:'Fraca',3:'Boa',4:'Muito boa',5:'Excelente'};
-const DEMO_AVALIACOES = true;   /* INTEGRAÇÃO: false — as avaliações reais vêm do backend */
+const DEMO_AVALIACOES = MODO_DEMO;   /* avaliações fictícias só no modo demonstração */
 function mediaAval(x){
   const a=x.avaliacoes||[], n=a.length;
   return {n, media: n ? Math.round(a.reduce((t,v)=>t+v.nota,0)/n*10)/10 : null};
@@ -1483,7 +1492,10 @@ function pintarArquivoSel(){
   document.getElementById('i-arq').value='';
 }
 function baixarArquivo(a){
-  if(!a || !a.blob){ toast('Arquivo indisponível nesta sessão.','err'); return; }
+  if(a && !a.blob && a.dataUrl){ const el=document.createElement('a'); el.href=a.dataUrl; el.download=a.nome;
+    document.body.appendChild(el); el.click(); el.remove(); return; }
+  if(!a || !a.blob){ toast(a && a.grande ? 'Arquivo grande demais para ficar guardado no PPR: só estava disponível na sessão em que foi enviado.'
+                                   : 'Arquivo indisponível nesta sessão.','err'); return; }
   const url=URL.createObjectURL(a.blob), el=document.createElement('a');
   el.href=url; el.download=a.nome; document.body.appendChild(el); el.click(); el.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1500);
@@ -2009,7 +2021,7 @@ function salvar(status){
   }
   /* skill nova: quem cadastra é o criador e o primeiro owner */
   const it=mkItem(Object.assign({owner:eu},dados),status,eu.iniciais);
-  it.autorEmail=eu.email; it.origem='novo'; it.arquivoNovo=ARQ_SEL;
+  it.id=novoId(); it.autorEmail=eu.email; it.origem='novo'; it.arquivoNovo=ARQ_SEL;
   if(status==='aprovada') iniciarHistorico(it,'Versão inicial');
   ITENS.push(it);
   fechar('m-form'); montarChips();
@@ -2220,7 +2232,7 @@ function handleFile(input){
         } else iniciarHistorico(it,'Versão inicial — importada da lista corrida');
         return derivar(it);
       });
-      novas.forEach(x=>{ x.id=SEQ++; ITENS.push(x); });
+      novas.forEach(x=>{ if(x.id<1e12) x.id=novoId(); ITENS.push(x); });
       montarChips(); render();
       toast('Base atualizada: <b>'+lidas.length+'</b> skills lidas de '+htm(file.name)+(novas.length?' · '+novas.length+' cadastro(s) desta sessão preservado(s)':''),'ok');
     }catch(err){ toast('Não foi possível ler a planilha: '+htm(err.message)+' — base anterior mantida.','err'); }
@@ -2247,6 +2259,105 @@ document.addEventListener('keydown',e=>{
   }
 });
 
+/* ══════════════════════════════════════════════════════════════════════════
+   DADOS NO PPR — ponte ppr.data.* (app freeform_dados do PPR)
+   Coleções desta ferramenta:
+     skills       — uma skill por registro (chave = id), com proposta, histórico e avaliações
+     meu_pessoas  — nome e iniciais de cada pessoa (cada um só grava o próprio e-mail)
+   Depois de cada render() as skills que mudaram são gravadas, uma requisição por vez.
+   Cada gravação leva a versão lida; se outra pessoa gravou antes (409), as skills são
+   recarregadas do PPR e a alteração local é descartada, com aviso.
+   Atenção: o servidor confere quem tem acesso à ferramenta, mas não as regras de
+   aprovação — essas continuam só no navegador.
+   ══════════════════════════════════════════════════════════════════════════ */
+let PPR_ORIGEM=null, DADOS_ON=false, REQ_N=0;
+const PEND={}, SALVO={};   /* SALVO[id] = {json, versao} do que está gravado no PPR */
+const ARQ_MAX = 300*1024;  /* anexos até este tamanho ficam guardados junto da skill */
+function novoId(){ return Date.now()*1000 + Math.floor(Math.random()*1000); }
+function pprData(type, payload){
+  return new Promise((res,rej)=>{
+    const id='d'+(++REQ_N); PEND[id]={res,rej};
+    window.parent.postMessage({type, id, payload}, PPR_ORIGEM);
+    setTimeout(()=>{ if(PEND[id]){ delete PEND[id]; rej(new Error('O PPR não respondeu.')); } }, 20000);
+  });
+}
+function serial(x){ return JSON.stringify(x, (k,v)=> k==='blob' ? undefined : v); }
+function arquivosDe(x){
+  return [x.arquivoNovo, x.proposta && x.proposta.arquivo].concat((x.historico||[]).map(h=>h.arquivo)).filter(Boolean);
+}
+function paraDataUrl(blob){
+  return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(blob); });
+}
+async function prepararArquivos(x){
+  for(const a of arquivosDe(x)){
+    if(!a.blob || a.dataUrl || a.grande) continue;
+    if((a.tamanho||a.blob.size) > ARQ_MAX){ a.grande=true; continue; }
+    a.dataUrl = await paraDataUrl(a.blob);
+  }
+}
+let SYNC_T=null, SYNC_RODANDO=false, SYNC_DE_NOVO=false;
+function agendarSync(){ if(!DADOS_ON) return; clearTimeout(SYNC_T); SYNC_T=setTimeout(sincronizar, 400); }
+async function sincronizar(){
+  if(SYNC_RODANDO){ SYNC_DE_NOVO=true; return; }
+  SYNC_RODANDO=true;
+  let conflito=false, falha=null;
+  try{
+    for(const x of ITENS.slice()){
+      await prepararArquivos(x);
+      const j=serial(x), sv=SALVO[x.id];
+      if(sv && sv.json===j) continue;
+      const r=await pprData('ppr.data.save', {colecao:'skills', chave:String(x.id), dados:JSON.parse(j), versao:sv?sv.versao:0});
+      if(r.status===200 || r.status===201){ SALVO[x.id]={json:j, versao:r.registro.versao}; }
+      else if(r.status===409){ conflito=true; break; }
+      else { falha=r.erro||('erro '+r.status); break; }
+    }
+    if(!conflito && !falha){
+      const ids=new Set(ITENS.map(x=>String(x.id)));
+      for(const id of Object.keys(SALVO)){
+        if(ids.has(String(id))) continue;
+        const r=await pprData('ppr.data.delete', {colecao:'skills', chave:String(id), versao:SALVO[id].versao});
+        if(r.status===200){ delete SALVO[id]; }
+        else if(r.status===409){ conflito=true; break; }
+        else { falha=r.erro||('erro '+r.status); break; }
+      }
+    }
+  }catch(e){ falha=e.message; }
+  if(conflito){
+    try{ await carregarSkills(); _render(); }catch(e){ falha=e.message; }
+    toast('Outra pessoa alterou uma skill ao mesmo tempo. A versão dela foi mantida — confira e refaça sua alteração, se ainda fizer sentido.','err');
+  }
+  if(falha) toast('Não foi possível salvar no PPR: '+htm(falha),'err');
+  SYNC_RODANDO=false;
+  if(SYNC_DE_NOVO){ SYNC_DE_NOVO=false; agendarSync(); }
+}
+async function carregarSkills(){
+  const r=await pprData('ppr.data.list', {colecao:'skills'});
+  if(r.status!==200) throw new Error(r.erro||('erro '+r.status));
+  Object.keys(SALVO).forEach(k=>delete SALVO[k]);
+  if(!r.registros.length){ semear(); return false; }     /* primeira vez: a base inicial é gravada no PPR */
+  ITENS = r.registros.map(g=>{ const x=derivar(g.dados); SALVO[x.id]={json:serial(x), versao:g.versao}; return x; });
+  ITENS.sort((a,b)=>a.id-b.id);
+  return true;
+}
+async function carregarPessoas(){
+  const r=await pprData('ppr.data.list', {colecao:'meu_pessoas'});
+  if(r.status!==200) throw new Error(r.erro||('erro '+r.status));
+  PESSOAS = r.registros.map(g=>({email:g.chave, nome:g.dados.nome||g.chave, iniciais:g.dados.iniciais||''}));
+  PESSOAS.forEach(p=>{ if(p.iniciais) INI_PREF[p.email]=p.iniciais; });   /* o que está no PPR vale mais que o deste navegador */
+}
+async function gravarPessoa(){
+  const u=window.GRADUS_USUARIO; if(!u) return;
+  const lista=await pprData('ppr.data.list', {colecao:'meu_pessoas'});
+  const atual=(lista.registros||[]).find(g=>g.chave===u.email);
+  const dados={nome:u.nome, iniciais:INI_PREF[u.email]||''};
+  if(atual && atual.dados.nome===dados.nome && (atual.dados.iniciais||'')===dados.iniciais) return;
+  await pprData('ppr.data.save', {colecao:'meu_pessoas', chave:u.email, dados, versao:atual?atual.versao:0});
+}
+
+/* toda alteração passa por render(): é ali que a gravação é agendada */
+const _render = render;
+render = function(){ _render.apply(this, arguments); agendarSync(); };
+
 /* ── partida: modo demo inicia direto; no PPR espera o ppr.init com o usuário logado ── */
 function usuarioDoPPR(u){
   const email=String(u.email||'').trim().toLowerCase();
@@ -2259,18 +2370,39 @@ function semPPR(msg){
     +'<div style="font-size:18px;font-weight:700;margin-bottom:8px">Repositório de Skills</div>'
     +'<div style="font-size:14px;color:#4A5E73">'+msg+'</div></div>';
 }
+async function iniciarNoPPR(){
+  let erro=null;
+  try{
+    await carregarPessoas();
+    await carregarSkills();
+    DADOS_ON=true;
+  }catch(e){
+    erro=e; DADOS_ON=false;
+    if(!ITENS.length) semear();
+  }
+  iniciar();
+  if(erro) toast('Não foi possível ler os dados do PPR ('+htm(erro.message)+'). Nada do que você fizer agora será salvo — recarregue a página.','err');
+  else gravarPessoa().catch(()=>{});
+}
 if(MODO_DEMO){
   iniciar();
 } else {
   let iniciado=false;
   window.addEventListener('message', ev=>{
     if(ev.source!==window.parent || !PPR_ORIGENS.includes(ev.origin)) return;
-    const m=ev.data;
-    if(!m || m.type!=='ppr.init' || !m.payload || !m.payload.user || !m.payload.user.email) return;
+    const m=ev.data; if(!m || typeof m.type!=='string') return;
+    if((m.type==='ppr.data.result' || m.type==='ppr.error') && PEND[m.id]){
+      const pd=PEND[m.id]; delete PEND[m.id];
+      if(m.type==='ppr.error') pd.rej(new Error((m.payload&&m.payload.message)||'erro na ponte'));
+      else pd.res(m.payload||{});
+      return;
+    }
+    if(m.type!=='ppr.init' || !m.payload || !m.payload.user || !m.payload.user.email) return;
+    PPR_ORIGEM=ev.origin;
     window.GRADUS_USUARIO=usuarioDoPPR(m.payload.user);
-    if(!iniciado){ iniciado=true; iniciar(); }
-    else { carregarUsuario(); pintarUsuario(); montarAdmBar(); render(); }
     window.parent.postMessage({type:'ppr.ready'}, ev.origin);
+    if(!iniciado){ iniciado=true; iniciarNoPPR(); }
+    else { carregarUsuario(); pintarUsuario(); montarAdmBar(); _render(); }
   });
   setTimeout(()=>{ if(!iniciado) semPPR(window.parent===window
       ? 'Esta ferramenta é aberta pelo PPR, que identifica o usuário logado. Acesse pelo catálogo de ferramentas do PPR.'

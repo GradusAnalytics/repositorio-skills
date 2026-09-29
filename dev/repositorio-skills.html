@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repositório de Skills — Gradus Consultoria</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dk1:#002060;--dk2:#12376C;--lt2:#9DB1CF;
+  --brand-blue:#296DB7;--brand-dark:#020102;--brand-gray:#666666;
+  --accent1:#E68E18;--accent2:#306F9F;--accent3:#800000;
+  --hdr-bg:#002060;--hdr-mid:#15497F;--green-ok:#00B050;
+  --g-bg:#F4F6FA;--g-surface:#FFFFFF;--g-surface2:#EEF2F8;
+  --g-border:#D9DCE6;--g-border2:#9DB1CF;
+  --g-text:#12376C;--g-text-dark:#002060;--g-text2:#4A5E73;--g-text3:#7B8EA0;
+  --g-accent-l:#FDF3E3;
+  --teal:#306F9F;--teal-l:#E5EFF7;
+  --amber:#E68E18;--amber-l:#FDF3E3;
+  --coral:#800000;--coral-l:#F5E5E5;
+  --blue:#002060;--blue-l:#EAF0F8;
+  --purple:#15497F;--purple-l:#E8EEF5;
+  --shadow-card:0 2px 8px rgba(0,32,96,.08);
+  --shadow-btn:0px 2px 3px rgba(0,32,96,.15);
+  --r:4px;--rsm:4px;
+}
+body{font-family:'Nunito','Gadugi','Calibri','Segoe UI',system-ui,sans-serif;background:var(--g-bg);color:var(--g-text);font-size:14px;line-height:1.5;min-height:100vh}
+button,input,select,textarea{font-family:inherit}
+
+/* ══════════ APPBAR ══════════ */
+.hdr{background:var(--hdr-bg);color:#fff;min-height:56px;padding:0 20px;display:flex;align-items:center;
+  justify-content:space-between;gap:15px;position:sticky;top:0;z-index:200;box-shadow:0 2px 6px rgba(0,32,96,.35)}
+.hdr-l{display:flex;align-items:center;gap:0;min-width:0}
+.gradus-logo{display:flex;align-items:center;flex-shrink:0}
+.hdr-sep{width:1px;height:28px;background:rgba(157,177,207,.35);margin:0 20px;flex-shrink:0}
+.hdr-crumb{display:flex;align-items:center;flex-wrap:wrap}
+.hdr-item{font-size:13px;color:rgba(255,255,255,.75);white-space:nowrap}
+.hdr-item.bold{font-weight:700;color:#fff}
+.hdr-item.label{font-weight:400;color:rgba(157,177,207,.7)}
+.hdr-dash{font-weight:700;color:rgba(255,255,255,.45);margin:0 9px;font-size:13px;user-select:none}
+.hdr-r{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.me{display:flex;align-items:center;gap:9px;padding:5px 9px 5px 5px;border-radius:20px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(157,177,207,.25)}
+.me-av{width:28px;height:28px;border-radius:50%;background:var(--brand-blue);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.me-av.adm{background:var(--accent1)}
+.me-t{line-height:1.25;min-width:0}
+.me-n{font-size:11.5px;font-weight:700;color:#fff;white-space:nowrap}
+.me-r{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(157,177,207,.95)}
+.demo-sw{display:flex;align-items:center;gap:7px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:rgba(230,142,24,.95);border:1px dashed rgba(230,142,24,.55);border-radius:16px;padding:3px 4px 3px 11px;white-space:nowrap}
+.demo-sw select{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(157,177,207,.35);border-radius:12px;
+  padding:3px 7px;font-size:11px;font-weight:600;outline:none;cursor:pointer;text-transform:none;letter-spacing:0}
+.demo-sw option{color:#002060;background:#fff}
+@media(max-width:1000px){.hdr{flex-wrap:wrap;padding-top:8px;padding-bottom:8px;position:relative}.app .tools{top:0}.hdr-r{margin-left:auto;flex-wrap:wrap;justify-content:flex-end;flex-shrink:1;min-width:0;gap:8px}}
+.btn-out{background:transparent;border:1px solid rgba(157,177,207,.4);color:rgba(255,255,255,.85);border-radius:2px;
+  padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-out:hover{background:rgba(255,255,255,.12);border-color:#fff;color:#fff}
+
+/* ══════════ TOOLBAR ══════════ */
+.tools{background:var(--g-surface);border-bottom:1px solid var(--g-border);padding:15px 20px 13px;position:sticky;top:56px;
+  z-index:180;box-shadow:0 2px 6px rgba(0,32,96,.05)}
+.tools-in{max-width:1320px;margin:0 auto}
+.tl1{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.search{flex:1;min-width:250px;display:flex;align-items:center;gap:9px;background:var(--g-bg);border:1.5px solid var(--g-border);
+  border-radius:22px;padding:0 16px;height:40px;transition:all .15s}
+.search:focus-within{border-color:var(--brand-blue);background:#fff;box-shadow:0 0 0 3px rgba(41,109,183,.1)}
+.search svg{flex-shrink:0;color:var(--g-text3)}
+.search input{flex:1;border:none;background:transparent;outline:none;font-size:13.5px;color:var(--g-text);height:100%}
+.search input::placeholder{color:var(--g-text3)}
+.btn-new{display:inline-flex;align-items:center;gap:7px;background:var(--accent1);color:#fff;border:none;border-radius:22px;
+  padding:0 20px;height:40px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(230,142,24,.32);
+  transition:all .15s;white-space:nowrap}
+.btn-new:hover{background:#CF7C0D;box-shadow:0 4px 12px rgba(230,142,24,.42)}
+.btn-ico{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:1px solid var(--g-border);
+  color:var(--g-text2);border-radius:20px;height:40px;padding:0 15px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-ico:hover{border-color:var(--hdr-mid);color:var(--hdr-bg);background:var(--blue-l)}
+
+.tools.min .tools-more{display:none}
+.btn-flt .arr{display:inline-block;transition:transform .15s}
+.tools.min .btn-flt .arr{transform:rotate(-90deg)}
+.btn-flt .bdg{background:var(--accent1);color:#fff;border-radius:9px;padding:0 6px;font-size:10px;min-width:17px;text-align:center}
+.flt-res{font-size:11.5px;color:var(--g-text2);font-weight:600;white-space:nowrap;display:none}
+.flt-res b{color:var(--dk1)}
+.tools.min .flt-res{display:inline}
+.dd-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.dd{position:relative}
+.dd-btn{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px 0 15px;border-radius:17px;border:1px solid var(--g-border);
+  background:#fff;color:var(--g-text2);font-size:12px;font-weight:700;cursor:pointer;transition:all .13s;white-space:nowrap}
+.dd-btn:hover{border-color:var(--g-border2);color:var(--dk1)}
+.dd.open .dd-btn{border-color:var(--hdr-mid);box-shadow:0 0 0 3px rgba(21,73,127,.1);color:var(--dk1)}
+.dd.on .dd-btn{background:var(--dk1);border-color:var(--dk1);color:#fff}
+.dd.on .dd-l{opacity:.72;font-weight:600}
+.dd-v{max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.dd-v::before{content:'·';margin-right:7px;opacity:.6}
+.dd-car{font-size:9px;opacity:.6;transition:transform .15s}
+.dd.open .dd-car{transform:rotate(180deg)}
+.dd-pan{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:250;min-width:290px;max-width:min(340px,calc(100vw - 32px));
+  background:#fff;border:1px solid var(--g-border);border-radius:6px;box-shadow:0 12px 30px rgba(0,20,64,.18);padding:6px}
+.dd-pan.dir{left:auto;right:0}
+.dd.open .dd-pan{display:block}
+.dd-ops{max-height:300px;overflow-y:auto}
+.dd-op{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:4px;cursor:pointer;font-size:12.5px;color:var(--g-text)}
+.dd-op:hover{background:var(--g-surface2)}
+.dd-op input{accent-color:var(--dk1);width:15px;height:15px;margin:0;cursor:pointer;flex-shrink:0}
+.dd-op .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dd-t{flex:1;min-width:0}
+.dd-c{font-size:10.5px;font-weight:700;color:var(--g-text3);background:var(--g-surface2);border-radius:9px;padding:0 7px;min-width:22px;text-align:center}
+.dd-op.zero{color:var(--g-text3)}
+.dd-op.zero .dd-c{opacity:.55}
+.dd-ft{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--g-border);margin-top:5px;padding:7px 9px 3px;
+  font-size:10.5px;color:var(--g-text3)}
+.dd-ft button{background:none;border:none;color:var(--accent3);font-size:11px;font-weight:700;cursor:pointer;padding:0}
+.dd-ft button:disabled{color:var(--g-text3);opacity:.5;cursor:default}
+.tl3{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:13px;padding-top:12px;border-top:1px solid var(--g-border)}
+.seg{display:inline-flex;background:var(--g-bg);border:1px solid var(--g-border);border-radius:20px;padding:3px}
+.seg button{background:transparent;border:none;border-radius:16px;padding:5px 15px;font-size:12px;font-weight:700;
+  color:var(--g-text2);cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:6px}
+.seg button.on{background:var(--dk1);color:#fff;box-shadow:0 1px 3px rgba(0,32,96,.2)}
+.seg button:not(.on):hover{color:var(--dk1)}
+.seg .n{background:rgba(0,32,96,.1);border-radius:9px;padding:0 6px;font-size:10px;min-width:17px;text-align:center}
+.seg button.on .n{background:rgba(255,255,255,.22)}
+.seg .n.hot{background:var(--accent1);color:#fff}
+.cnt{font-size:11.5px;color:var(--g-text2);font-weight:600}
+.cnt b{color:var(--dk1)}
+.btn-clear{background:transparent;border:1px solid var(--g-border);color:var(--g-text3);border-radius:16px;padding:4px 12px;
+  font-size:11px;cursor:pointer;transition:all .15s}
+.btn-clear:hover{border-color:var(--accent3);color:var(--accent3)}
+.grp-sel{background:#fff;border:1px solid var(--g-border);border-radius:16px;padding:4px 10px;font-size:11.5px;
+  color:var(--g-text);outline:none;font-weight:600}
+.adm-bar{margin-left:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.btn-sm{background:transparent;border:1px solid var(--g-border);color:var(--g-text3);border-radius:16px;padding:4px 11px;
+  font-size:10.5px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-sm:hover{border-color:var(--accent1);color:var(--accent1);background:var(--g-accent-l)}
+input[type=file]{display:none}
+
+/* ══════════ POST-ITS ══════════ */
+.main{max-width:1320px;margin:0 auto;padding:22px 20px 40px}
+.grp-hd{display:flex;align-items:center;gap:11px;margin:26px 0 13px}
+.grp-hd.first{margin-top:2px}
+.grp-hd h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--dk1);white-space:nowrap}
+.grp-hd i{flex:1;height:1px;background:var(--g-border);display:block}
+.grp-n{font-size:10px;font-weight:700;color:var(--g-text3);background:var(--g-surface2);border-radius:10px;padding:2px 9px;white-space:nowrap}
+.notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.pit{position:relative;border-radius:2px;padding:15px 17px 0;display:flex;flex-direction:column;min-height:216px;
+  border:1px solid rgba(0,32,96,.08);box-shadow:0 3px 9px rgba(0,32,96,.10),0 1px 2px rgba(0,32,96,.07);transition:all .16s}
+.pit:hover{transform:translateY(-3px) rotate(-.35deg);box-shadow:0 12px 26px rgba(0,32,96,.17)}
+.pit .fold{position:absolute;top:-1px;right:-1px;border-style:solid;border-width:0 21px 21px 0;
+  border-color:transparent var(--g-bg) transparent transparent;filter:drop-shadow(-1.5px 1.5px 1px rgba(0,32,96,.13))}
+.pit-acc{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px}
+.pit-tags{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:9px;padding-right:22px}
+.pit h4{font-size:15px;font-weight:700;color:var(--dk1);line-height:1.28;margin-bottom:6px}
+.pit-meta{font-size:10.5px;color:var(--g-text3);display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.pit-meta b{color:var(--g-text2);font-weight:700}
+.pit-meta em{font-style:normal;opacity:.5}
+.pit-d{font-size:12.5px;color:var(--g-text2);line-height:1.55;flex:1;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.pit-d.pend{color:#A07730;font-style:italic}
+.pit-ft{display:flex;gap:7px;align-items:center;margin:13px -17px 0;padding:10px 17px;
+  border-top:1px solid rgba(0,32,96,.07);flex-wrap:wrap}
+.btn-dl{display:inline-flex;align-items:center;gap:5px;background:var(--hdr-bg);color:#fff;border:none;border-radius:15px;
+  padding:5px 13px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-btn);transition:background .15s}
+.btn-dl:hover{background:var(--hdr-mid)}
+.btn-gh{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.75);color:var(--g-text2);
+  border:1px solid rgba(0,32,96,.12);border-radius:15px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-gh:hover{border-color:var(--hdr-mid);color:var(--hdr-bg);background:#fff}
+.btn-gh.ok{color:#00893F;border-color:rgba(0,176,80,.4)}
+.btn-gh.ok:hover{background:#E5F7EC;color:#00893F;border-color:var(--green-ok)}
+.btn-gh.no{color:var(--accent3);border-color:rgba(128,0,0,.3)}
+.btn-gh.no:hover{background:var(--coral-l);color:var(--accent3);border-color:var(--accent3)}
+.pit-doc{margin-left:auto;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g-text3);
+  display:flex;align-items:center;gap:4px;white-space:nowrap}
+.pit-doc i{width:6px;height:6px;border-radius:50%;background:var(--g-border2);display:block}
+.pit-doc.ok i{background:var(--green-ok)}
+.pit-doc.part i{background:var(--accent1)}
+.pit-flag{background:rgba(255,255,255,.7);border:1px dashed rgba(0,32,96,.2);border-radius:3px;padding:7px 10px;
+  font-size:10.5px;color:var(--g-text2);line-height:1.55;margin:11px -3px 0}
+.pit-flag b{color:var(--dk1)}
+
+/* ══════════ PILLS / TAGS ══════════ */
+.pill{display:inline-block;padding:2px 9px;border-radius:11px;font-size:10px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
+.pt{background:#E5EFF7;color:#25597F}.pa{background:#FDF3E3;color:#B36E0C}.pc{background:#F5E5E5;color:#800000}
+.pb{background:#EAF0F8;color:#002060}.pp{background:#EEF2F8;color:#15497F}.pg{background:#F2F2F2;color:#6A6A6A}
+.pok{background:#E5F7EC;color:#00893F}
+.rt{color:#B36E0C;font-weight:700;white-space:nowrap}
+.rt.vazio{color:var(--g-text3);font-weight:600}
+.aval{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--g-surface2);border:1px solid var(--g-border);
+  border-radius:3px;padding:10px 14px;margin:-2px 0 18px}
+.aval-msg{font-size:11.5px;color:var(--g-text2);line-height:1.5}
+.stars{display:inline-flex}
+.btn-rm-aval{background:transparent;border:1px solid var(--g-border);color:var(--g-text3);border-radius:14px;padding:3px 11px;
+  font-size:10.5px;font-weight:600;cursor:pointer;white-space:nowrap;margin-left:auto;transition:all .15s}
+.btn-rm-aval:hover{border-color:var(--accent3);color:var(--accent3);background:var(--coral-l)}
+.stars button{background:none;border:none;font-size:26px;line-height:1;color:#D9DCE6;cursor:pointer;padding:0 2px;transition:color .1s,transform .1s}
+.stars button.on{color:#E68E18}
+.stars:hover button{color:#E68E18}
+.stars button:hover~button{color:#D9DCE6}
+.stars button:hover{transform:scale(1.12)}
+.stars button:focus-visible{outline:2px solid var(--brand-blue);outline-offset:1px;border-radius:2px}
+.dtabs{display:flex;gap:2px;background:var(--hdr-mid);padding:0 16px;flex-wrap:wrap}
+.dtabs button{background:transparent;border:none;color:rgba(255,255,255,.72);font-size:12px;font-weight:700;padding:9px 13px 7px;
+  cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.2px;display:inline-flex;align-items:center;gap:6px}
+.dtabs button:hover{color:#fff}
+.dtabs button.on{color:#fff;border-bottom-color:var(--accent1)}
+.dtabs .n{background:rgba(255,255,255,.18);border-radius:9px;padding:0 6px;font-size:10px}
+.dtabs .n.hot{background:var(--accent1);color:#fff}
+.htab{width:100%;border-collapse:collapse;font-size:12px}
+.htab th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--g-text3);font-weight:700;
+  padding:6px 8px;border-bottom:1px solid var(--g-border);white-space:nowrap}
+.htab td{padding:9px 8px;border-bottom:1px solid var(--g-border);vertical-align:top;color:var(--g-text);line-height:1.5}
+.htab tr.atual td{background:var(--blue-l)}
+.htab .vv{font-weight:700;color:var(--dk1);white-space:nowrap}
+.htab.dif td.old{color:var(--g-text3);white-space:pre-wrap}
+.htab.dif td.new{color:var(--dk1);font-weight:600;background:#F2FAF5;white-space:pre-wrap}
+.hsub{font-size:10.5px;color:var(--g-text3);font-weight:400}
+.cred{font-size:11px;color:var(--g-text3);line-height:1.8;margin-bottom:0}
+.cred b{color:var(--g-text2)}
+.apv{display:inline-block;font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;background:#fff;
+  border:1px solid var(--g-border);color:var(--g-text2);white-space:nowrap;font-style:normal}
+.apv.ok{color:#00893F;border-color:rgba(0,176,80,.45);background:#E5F7EC}
+button.me-av{border:none;cursor:pointer;position:relative;font-family:inherit;transition:box-shadow .15s}
+button.me-av:hover{box-shadow:0 0 0 2px rgba(255,255,255,.6)}
+.me-av.edit::after{content:'✎';position:absolute;right:-4px;bottom:-4px;width:14px;height:14px;border-radius:50%;background:#fff;
+  color:#002060;font-size:9px;line-height:14px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.drop{border:1.5px dashed var(--g-border2);border-radius:4px;background:#FBFCFE;padding:13px 16px;display:flex;align-items:center;
+  gap:12px;cursor:pointer;transition:all .15s;font-size:12.5px;color:var(--g-text2)}
+.drop:hover,.drop.over{border-color:var(--brand-blue);background:var(--blue-l)}
+.drop.bad{border-color:var(--accent3);background:var(--coral-l)}
+.drop .ic{font-size:22px;opacity:.65}
+.drop b{color:var(--dk1)}
+.arq{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--dk1);background:#fff;
+  border:1px solid var(--g-border);border-radius:14px;padding:3px 10px;cursor:pointer;max-width:100%;text-align:left;word-break:break-all}
+.arq:hover{border-color:var(--hdr-mid);background:var(--blue-l)}
+.imp-bar{background:#F4F8FC;border:1px solid #C9D8EC;border-radius:4px;padding:12px 14px;margin-bottom:18px}
+.imp-t{font-size:12px;color:var(--g-text2);line-height:1.6;margin-bottom:9px}
+.imp-t b{color:var(--dk1)}
+.imp-a{display:flex;gap:8px;flex-wrap:wrap}
+.imp-res{font-size:11.5px;line-height:1.65;margin-top:9px;display:none;color:var(--g-text2)}
+.imp-res.show{display:block}
+.imp-res .ok{color:#00893F;font-weight:700}
+.imp-res .av{color:#B36E0C}
+.fi .imp{border-color:#00B050!important;background:#F4FBF7!important}
+.pill.fonte{border:1px solid;letter-spacing:.5px;padding:1px 8px}
+.tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;border:1px solid;background:rgba(255,255,255,.6);white-space:nowrap}
+
+/* ══════════ MODAIS ══════════ */
+.mbg{position:fixed;inset:0;background:rgba(0,20,64,.58);z-index:600;display:none;align-items:flex-start;
+  justify-content:center;padding:36px 20px;overflow-y:auto}
+.mbg.show{display:flex}
+.mo{background:#fff;border-radius:5px;max-width:820px;width:100%;box-shadow:0 16px 48px rgba(0,10,35,.4);overflow:hidden}
+.mo.wide{max-width:900px}
+.mo-hd{background:var(--hdr-bg);color:#fff;padding:16px 24px;display:flex;align-items:flex-start;justify-content:space-between;gap:15px}
+.mo-hd h2{font-size:17.5px;font-weight:700;line-height:1.3}
+.mo-sub{font-size:11px;color:rgba(157,177,207,.95);margin-top:5px;display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.mo-x{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:2px;width:27px;height:27px;
+  font-size:15px;cursor:pointer;flex-shrink:0;line-height:1}
+.mo-x:hover{background:rgba(255,255,255,.15)}
+.mo-bd{padding:21px 24px;max-height:calc(100vh - 235px);overflow-y:auto}
+.mo-ft{border-top:1px solid var(--g-border);padding:13px 24px;display:flex;gap:9px;align-items:center;background:#FBFCFE;flex-wrap:wrap}
+.mo-ft .sp{margin-left:auto;font-size:10px;color:var(--g-text3)}
+.btn-p{display:inline-flex;align-items:center;gap:6px;background:var(--hdr-bg);color:#fff;border:none;border-radius:3px;
+  padding:8px 17px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-btn);transition:background .15s}
+.btn-p:hover{background:var(--hdr-mid)}
+.btn-p.go{background:var(--green-ok)}.btn-p.go:hover{background:#009243}
+.btn-p.warn{background:var(--accent1)}.btn-p.warn:hover{background:#CF7C0D}
+.btn-s{display:inline-flex;align-items:center;gap:5px;background:transparent;color:var(--g-text2);border:1px solid var(--g-border);
+  border-radius:3px;padding:8px 15px;font-size:12.5px;cursor:pointer;transition:all .15s}
+.btn-s:hover{border-color:var(--hdr-mid);color:var(--hdr-bg);background:var(--blue-l)}
+.btn-s.no:hover{border-color:var(--accent3);color:var(--accent3);background:var(--coral-l)}
+.fld{margin-bottom:16px}
+.fld-l{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--g-text3);margin-bottom:5px}
+.fld-v{font-size:13px;color:var(--g-text);line-height:1.65}
+.fld-v.pend{color:#A07730;font-style:italic;font-size:12px}
+.fld-v ul{margin:0;padding-left:19px}
+.fld-v li{margin-bottom:5px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:13px;margin-bottom:19px;padding-bottom:16px;
+  border-bottom:1px solid var(--g-border)}
+.mg-i .fld-l{margin-bottom:3px}
+.mg-i .fld-v{font-size:13px;font-weight:700;color:var(--dk1)}
+.pre{background:var(--g-surface2);border:1px solid var(--g-border);border-radius:2px;padding:13px 15px;
+  font-family:'Consolas','Courier New',monospace;font-size:10.5px;line-height:1.62;color:var(--dk2);white-space:pre-wrap;
+  max-height:330px;overflow-y:auto}
+
+/* ══════════ FORMULÁRIO ══════════ */
+.fnote{background:var(--blue-l);border-left:4px solid var(--hdr-mid);border-radius:0 3px 3px 0;padding:11px 15px;
+  margin-bottom:19px;font-size:12px;color:var(--hdr-bg);line-height:1.65}
+.fnote strong{color:var(--accent1)}
+.fnote.warn{background:var(--g-accent-l);border-left-color:var(--accent1)}
+.fsec{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--dk1);
+  border-bottom:1px solid var(--g-border);padding-bottom:6px;margin:22px 0 14px}
+.fsec:first-child{margin-top:0}
+.frow{display:grid;gap:13px;margin-bottom:13px}
+.frow.c2{grid-template-columns:1fr 1fr}
+.frow.c3{grid-template-columns:1fr 1fr 1fr}
+.frow.c4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:860px){.frow.c4{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.frow.c2,.frow.c3,.frow.c4{grid-template-columns:1fr}}
+.fi label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g-text3);margin-bottom:4px}
+.fi label .rq{color:var(--accent3);margin-left:2px}
+.fi input,.fi select,.fi textarea{width:100%;background:#fff;border:1px solid var(--g-border);border-radius:3px;
+  padding:8px 10px;font-size:12.5px;color:var(--g-text);outline:none;transition:all .15s}
+.fi textarea{resize:vertical;min-height:66px;line-height:1.6}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--hdr-mid);box-shadow:0 0 0 2px rgba(0,32,96,.1)}
+.fi input.bad,.fi select.bad,.fi textarea.bad{border-color:var(--accent3);box-shadow:0 0 0 2px rgba(128,0,0,.09)}
+.fi .hint{font-size:10px;color:var(--g-text3);margin-top:4px;line-height:1.5}
+.ferr{background:var(--coral-l);border-left:4px solid var(--accent3);border-radius:0 3px 3px 0;padding:10px 14px;
+  font-size:12px;color:var(--accent3);font-weight:600;margin-bottom:16px;display:none;line-height:1.6}
+.ferr.show{display:block}
+.rej{background:var(--coral-l);border:1px solid rgba(128,0,0,.2);border-radius:3px;padding:10px 12px;margin-top:11px}
+.rej textarea{width:100%;border:1px solid rgba(128,0,0,.25);border-radius:3px;padding:6px 9px;font-size:11.5px;
+  min-height:48px;resize:vertical;outline:none;background:#fff}
+.rej-a{display:flex;gap:7px;margin-top:8px}
+
+/* ══════════ MISC ══════════ */
+.empty{text-align:center;padding:60px 20px;color:var(--g-text3);font-size:13.5px;line-height:1.7}
+.empty-icon{font-size:34px;margin-bottom:10px;opacity:.35}
+.empty b{color:var(--g-text2)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--dk1);color:#fff;
+  padding:12px 22px;border-radius:3px;font-size:12.5px;font-weight:600;box-shadow:0 10px 28px rgba(0,10,35,.34);z-index:900;
+  opacity:0;transition:all .26s;pointer-events:none;max-width:min(580px,92vw);text-align:center;line-height:1.5}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#00893F}.toast.err{background:var(--accent3)}.toast.warn{background:#B36E0C}
+code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5px;border-radius:2px;font-size:10.5px;color:var(--hdr-mid)}
+.wm{text-align:center;padding:14px 20px;font-size:10.5px;color:var(--g-text3);border-top:1px solid var(--g-border);line-height:1.7}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:var(--g-bg)}
+::-webkit-scrollbar-thumb{background:var(--lt2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent2)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ APP ═══════════════════ -->
+<div class="app" id="app">
+
+  <div class="hdr">
+    <div class="hdr-l">
+      <div class="gradus-logo">
+        <img src="data:image/png;base64,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" alt="Gradus Consultoria" style="height:38px;width:auto;display:block">
+      </div>
+      <div class="hdr-sep"></div>
+      <div class="hdr-crumb">
+        <span class="hdr-item bold">Repositório de Skills</span>
+        <span class="hdr-dash">-</span>
+        <span class="hdr-item label">Gestão Metodológica</span>
+      </div>
+    </div>
+    <div class="hdr-r">
+      <div class="demo-sw" id="demo-sw" style="display:none"></div>
+      <div class="me" id="me"></div>
+    </div>
+  </div>
+
+  <div class="tools">
+    <div class="tools-in">
+      <div class="tl1">
+        <div class="search">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.8" cy="6.8" r="4.8" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <input type="text" id="q" placeholder="Buscar skill por nome, categoria, escopo, exemplo, responsável..." oninput="render()">
+        </div>
+        <span class="flt-res" id="flt-res"></span>
+        <button class="btn-ico btn-flt" id="btn-flt" onclick="alternarFiltros()" title="Mostrar ou recolher filtros e abas"></button>
+        <button class="btn-ico" onclick="abrirAjuda()" title="Como funciona o repositório">? Como funciona</button>
+        <button class="btn-new" onclick="abrirForm()">+ Adicionar skill</button>
+      </div>
+
+      <div class="tools-more" id="tools-more">
+      <div class="dd-row" id="dd-row"></div>
+
+      <div class="tl3">
+        <div class="seg" id="seg"></div>
+        <span class="cnt" id="cnt"></span>
+        <button class="btn-clear" onclick="limpar()">Limpar filtros</button>
+        <select class="grp-sel" id="grp" onchange="render()" title="Agrupar os cards">
+          <option value="m">Agrupar por metodologia</option>
+          <option value="c">Agrupar por categoria</option>
+          <option value="est">Agrupar por estágio</option>
+          <option value="r">Agrupar por responsável</option>
+          <option value="">Sem agrupamento</option>
+        </select>
+        <div class="adm-bar" id="adm-bar"></div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main"><div id="body"></div></div>
+
+  <div class="wm">
+    Repositório de Skills · Gradus Consultoria — base inicial: lista corrida GRA500 “Desenvolvimentos de AI” (29/05/2026)<br>
+    Protótipo: as skills cadastradas nesta sessão ficam apenas na memória do navegador. Use <b>Exportar cadastros</b> para levar as novas fichas para a base oficial.
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL DETALHE ═══════════════════ -->
+<div class="mbg" id="m-det" onclick="if(event.target===this)fechar('m-det')">
+  <div class="mo">
+    <div class="mo-hd">
+      <div><h2 id="d-t"></h2><div class="mo-sub" id="d-s"></div></div>
+      <button class="mo-x" onclick="fechar('m-det')">✕</button>
+    </div>
+    <div class="dtabs" id="d-tabs"></div>
+    <div class="mo-bd" id="d-b"></div>
+    <div class="mo-ft" id="d-f"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL FORMULÁRIO ═══════════════════ -->
+<div class="mbg" id="m-form" onclick="if(event.target===this)fechar('m-form')">
+  <div class="mo wide">
+    <div class="mo-hd">
+      <div><h2 id="f-t">Adicionar skill ao repositório</h2><div class="mo-sub" id="f-s"></div></div>
+      <button class="mo-x" onclick="fechar('m-form')">✕</button>
+    </div>
+    <div class="mo-bd" id="f-bd">
+      <div class="fnote" id="f-note"></div>
+      <div class="ferr" id="f-err"></div>
+
+      <div class="imp-bar" id="f-imp">
+        <div class="imp-t"><b>Preencher com o Claude:</b> baixe o template, anexe no Claude junto com o arquivo da skill e peça
+          <i>"preencha este template com base na skill anexada"</i>. Depois importe o .md aqui — o formulário fica preenchido para você revisar.</div>
+        <div class="imp-a">
+          <button type="button" class="btn-s" onclick="baixarTemplate()">⬇ Template para o Claude</button>
+          <button type="button" class="btn-p" onclick="document.getElementById('i-md').click()">⬆ Importar ficha (.md)</button>
+        </div>
+        <input type="file" id="i-md" accept=".md,.markdown,.txt,text/markdown,text/plain" onchange="importarMd(this.files[0])">
+        <div class="imp-res" id="f-imp-res"></div>
+      </div>
+
+      <div id="f-ver" style="display:none">
+        <div class="fsec">Nova versão</div>
+        <div class="frow"><div class="fi"><label>O que mudou nesta versão <span class="rq">*</span></label>
+          <textarea id="i-notas" placeholder="Ex: incluí o passo a passo de uso e corrigi os inputs necessários."></textarea>
+          <div class="hint">Aparece no histórico e para quem vai aprovar.</div></div></div>
+      </div>
+
+      <div id="f-arq" style="display:none">
+        <div class="fsec" id="f-arq-tit">Arquivo da skill</div>
+        <div class="frow" id="f-arq-drop"><div class="fi"><label id="lbl-arq"></label>
+          <div class="drop" id="drop-arq" onclick="document.getElementById('i-arq').click()"
+            ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="soltarArquivo(event)">
+            <span class="ic">📎</span><div id="drop-txt"></div></div>
+          <input type="file" id="i-arq" onchange="escolherArquivo(this.files[0])">
+          <div class="hint" id="hint-arq"></div></div></div>
+        <div class="frow" id="f-arq-repo"><div class="fi"><label>Link do repositório <span class="rq">*</span></label>
+          <input type="url" id="i-repo" placeholder="https://github.com/..." maxlength="400">
+          <div class="hint">Skill da internet (EXT): onde está o repositório original. Com o link, o arquivo passa a ser opcional.</div></div></div>
+      </div>
+
+      <div class="fsec">Identificação</div>
+      <div class="frow c2">
+        <div class="fi"><label>Nome da skill <span class="rq">*</span></label>
+          <input type="text" id="i-d" placeholder="Ex: Classificador de fornecedores" maxlength="90">
+          <div class="hint">Como o pessoal vai procurar por ela no repositório.</div></div>
+        <div class="fi"><label>Responsável (owner)</label>
+          <input type="text" id="i-r" readonly tabindex="-1" style="background:var(--g-surface2);color:var(--g-text2)">
+          <div class="hint">Quem cadastrou ou teve a última versão aprovada. Para trocar suas iniciais, clique nelas no topo.</div></div>
+      </div>
+      <div class="frow c4">
+        <div class="fi"><label>Categoria <span class="rq">*</span></label><select id="i-c"></select>
+          <div class="hint">Para que serve: análise, apresentação, padrão...</div></div>
+        <div class="fi"><label>Metodologia <span class="rq">*</span></label><select id="i-m"></select></div>
+        <div class="fi"><label>Formato <span class="rq">*</span></label><select id="i-t"></select>
+          <div class="hint">Como roda: HTML, skill do Claude, PPR...</div></div>
+        <div class="fi"><label>Fonte <span class="rq">*</span></label><select id="i-f" onchange="pintarBlocoArquivo()"></select>
+          <div class="hint" id="i-f-hint">De onde a skill veio.</div></div>
+      </div>
+      <div class="frow c4">
+        <div class="fi"><label>Estágio <span class="rq">*</span></label><select id="i-e">
+          <option value="WIP">WIP — em desenvolvimento</option>
+          <option value="MVP1">MVP1 — primeira versão utilizável</option>
+          <option value="MVP2">MVP2 — segunda iteração</option>
+        </select></div>
+        <div class="fi"><label>Amplitude</label><select id="i-amp">
+          <option value="">Não classificada</option>
+          <option value="1">1 — Geral Gradus</option>
+          <option value="2">2 — Geral na metodologia</option>
+          <option value="3">3 — Análise específica</option>
+        </select></div>
+        <div class="fi"><label>Impacto em horas</label><select id="i-hr">
+          <option value="">Não avaliado</option><option value="1">1 — Baixo</option><option value="2">2 — Médio</option>
+          <option value="3">3 — Alto</option><option value="4">4 — Muito alto</option>
+        </select></div>
+        <div class="fi"><label>Impacto em qualidade</label><select id="i-q">
+          <option value="">Não avaliado</option><option value="1">1 — Baixo</option><option value="2">2 — Médio</option>
+          <option value="3">3 — Alto</option><option value="4">4 — Muito alto</option>
+        </select></div>
+      </div>
+
+      <div class="fsec">O que a skill faz</div>
+      <div class="frow">
+        <div class="fi"><label>Escopo — o que ela entrega <span class="rq">*</span></label>
+          <textarea id="i-esc" placeholder="Ex: recebe a base de processos, trata, define o recorte com o consultor e devolve modelo, dados classificados e apresentação pronta."></textarea>
+          <div class="hint">Duas ou três linhas descrevendo o resultado, não o passo a passo.</div></div>
+      </div>
+      <div class="frow c2">
+        <div class="fi"><label>O que é necessário para rodar (inputs)</label>
+          <textarea id="i-in" placeholder="Ex: base de custos por imóvel em .xlsx com colunas imóvel, m2, aluguel mensal e vigência."></textarea></div>
+        <div class="fi"><label>O que sai no final (output)</label>
+          <textarea id="i-out" placeholder="Ex: HTML com 6 análises e exportação em CSV, ou deck .pptx no padrão OM."></textarea></div>
+      </div>
+      <div class="frow">
+        <div class="fi"><label>Como usar — passo a passo</label>
+          <textarea id="i-uso" placeholder="Uma etapa por linha. Ex:&#10;1. Invoque a skill no Claude&#10;2. Anexe a base tratada&#10;3. Confirme o recorte sugerido" style="min-height:86px"></textarea>
+          <div class="hint">Uma etapa por linha — vira lista numerada na ficha .md.</div></div>
+      </div>
+      <div class="frow c2">
+        <div class="fi"><label>Exemplos de uso</label>
+          <textarea id="i-ex" placeholder="Um por linha. Ex: MAG001 — deck de aluguéis"></textarea>
+          <div class="hint">Projetos ou análises onde já rodou.</div></div>
+        <div class="fi"><label>Backlog / melhorias previstas</label>
+          <textarea id="i-com" placeholder="Um por linha. Ex: incluir a pirâmide de Minto"></textarea>
+          <div class="hint">Vira checklist na ficha .md.</div></div>
+      </div>
+
+      <div class="fsec">Onde encontrar e observações</div>
+      <div class="frow c2">
+        <div class="fi"><label>Onde está o arquivo / como acessar</label>
+          <input type="text" id="i-link" placeholder="Ex: SharePoint › Gestão Metodológica › Skills, ou nome da skill no Claude" maxlength="220"></div>
+        <div class="fi"><label>Observações</label>
+          <input type="text" id="i-obs" placeholder="Ex: versão beta, não chamar automático" maxlength="220"></div>
+      </div>
+    </div>
+    <div class="mo-ft" id="f-f"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL AJUDA ═══════════════════ -->
+<div class="mbg" id="m-ajuda" onclick="if(event.target===this)fechar('m-ajuda')">
+  <div class="mo">
+    <div class="mo-hd">
+      <div><h2>Como funciona o repositório</h2><div class="mo-sub">Perfis, fluxo de aprovação e legendas</div></div>
+      <button class="mo-x" onclick="fechar('m-ajuda')">✕</button>
+    </div>
+    <div class="mo-bd">
+      <div class="fsec">Os dois perfis</div>
+      <div class="frow c2">
+        <div class="fi"><label>Consulta</label><div class="fld-v" style="font-size:12.5px">
+          Vê e baixa todas as skills, <b>publica skills novas direto</b> (e vira o owner delas), propõe novas versões de qualquer skill
+          e aprova as versões propostas para as skills das quais é owner.
+        </div></div>
+        <div class="fi"><label>Admin — Gestão Metodológica</label><div class="fld-v" style="font-size:12.5px">
+          Tudo do perfil consulta, mais: marca skills como <b>ORG</b>, aprova as versões de skills ORG (junto com o owner), publica versões direto,
+          ajusta qualquer ficha sem gerar versão, atualiza a base pela lista corrida e exporta os cadastros.
+        </div></div>
+      </div>
+
+      <div class="fsec">Como cadastrar uma skill</div>
+      <div class="fld-v" style="font-size:12.5px">
+        <ul>
+          <li>Clique em <b>+ Adicionar skill</b>. Para ganhar tempo, use <b>⬇ Template para o Claude</b>: anexe o template no Claude junto com o
+            arquivo da skill e peça para preencher. Depois, <b>⬆ Importar ficha (.md)</b> — o formulário fica preenchido para você revisar.</li>
+          <li>Anexe o arquivo da skill (ou o link do repositório, se for da internet) e clique em <b>Publicar skill</b>: ela aparece na hora em
+            <b>Disponíveis</b> e você passa a ser o owner.</li>
+          <li>Depois de publicada, qualquer mudança entra como <b>nova versão</b> — o template e a importação de .md funcionam também ali.</li>
+        </ul>
+      </div>
+
+      <div class="fsec">Categoria e formato</div>
+      <div class="fld-v" style="font-size:12.5px;margin-bottom:12px">A <b>categoria</b> diz para que a skill serve e define a cor do card.
+        O <b>formato</b> (HTML, Skill do Claude, PPR...) diz como ela roda e aparece na ficha completa.</div>
+      <div class="frow c3" id="aj-cat"></div>
+
+      <div class="fsec">Fonte — de onde a skill veio</div>
+      <div class="fld-v" style="font-size:12.5px;margin-bottom:12px">A fonte aparece no card, ao lado do estágio.
+        O <b>Resp.</b> continua sendo quem mexeu por último na skill, independente da fonte.</div>
+      <div class="frow c3" id="aj-fonte"></div>
+
+      <div class="fsec">Versões e aprovação</div>
+      <div class="fld-v" style="font-size:12.5px">
+        <ul>
+          <li>Qualquer pessoa pode <b>subir uma nova versão</b> de uma skill publicada, pela ficha: anexando o <b>arquivo da nova versão</b> (.skill, .html...) e contando o que mudou. Quem aprova baixa o arquivo para testar.</li>
+          <li>O arquivo também é obrigatório no cadastro de uma <b>skill nova</b>. Skills da internet (<b>EXT</b>) informam o <b>link do repositório</b> no lugar dele — aí o arquivo passa a ser opcional.</li>
+          <li>A versão precisa da aprovação do <b>owner</b> (o Resp. da skill). Se a skill for <b>ORG</b>, também do <b>admin</b> — aprovação dupla, em qualquer ordem.</li>
+          <li>Aprovada, ela vira a versão atual (v1, v2, v3...) e <b>quem subiu passa a ser o owner</b>. Recusada, volta com o motivo em <b>Minhas sugestões</b>.</li>
+          <li>Só uma proposta por vez por skill. Enquanto ela é analisada, a versão atual continua valendo para todos.</li>
+          <li>O admin publica versões direto. Ajustes do admin em <b>Editar ficha</b> não geram versão nem mudam o owner.</li>
+          <li>A aba <b>Histórico</b> da ficha mostra todas as versões, quem subiu, quando, e permite baixar cada uma.</li>
+        </ul>
+      </div>
+
+      <div class="fsec">Avaliação</div>
+      <div class="fld-v" style="font-size:12.5px">Qualquer pessoa pode dar de <b>1 a 5 estrelas</b> a uma skill publicada, direto na ficha — a nota é salva no clique.
+        Vale uma nota por pessoa: avaliar de novo substitui a anterior. O card mostra a <b>média simples</b> e a quantidade de avaliações (ex.: <span class="rt">★ 4,3 · 12</span>).</div>
+
+      <div class="fsec">Estágio</div>
+      <div class="frow c3">
+        <div class="fi"><label><span class="pill pa">WIP</span></label><div class="fld-v" style="font-size:12px">Em construção. Ainda não liberada para uso amplo.</div></div>
+        <div class="fi"><label><span class="pill pt">MVP1</span></label><div class="fld-v" style="font-size:12px">Primeira versão utilizável, já disponível.</div></div>
+        <div class="fi"><label><span class="pill pok">MVP2</span></label><div class="fld-v" style="font-size:12px">Segunda iteração, escopo ampliado a partir do uso em projeto.</div></div>
+      </div>
+
+      <div class="fsec">Amplitude e impacto</div>
+      <div class="frow c2">
+        <div class="fi"><label>Amplitude</label><div class="fld-v" style="font-size:12px">
+          <b>1</b> Geral Gradus — serve a qualquer projeto · <b>2</b> Geral na metodologia — transversal dentro de OM, TO, MPC ou PMI ·
+          <b>3</b> Análise — endereça uma análise específica.</div></div>
+        <div class="fi"><label>Impacto (horas e qualidade)</label><div class="fld-v" style="font-size:12px">
+          <b>1</b> Baixo · <b>2</b> Médio · <b>3</b> Alto · <b>4</b> Muito alto. Horas = economia de horas de consultor;
+          qualidade = ganho no entregável.</div></div>
+      </div>
+
+      <div class="fsec">Semáforo de documentação</div>
+      <div class="fld-v" style="font-size:12.5px">
+        <ul>
+          <li><b>Completa</b> — tem escopo, ao menos um exemplo ou item de backlog, e impacto em horas avaliado.</li>
+          <li><b>Parcial</b> — tem algum texto descritivo, mas falta peça essencial.</li>
+          <li><b>Pendente</b> — sem nenhuma descrição. A ficha <code>.md</code> sai com marcadores <code>a preencher pelo responsável</code>.</li>
+        </ul>
+      </div>
+
+      <div class="fnote warn" style="margin:20px 0 0">
+        <strong>Limite do protótipo:</strong> não há servidor. O usuário logado vem da aplicação que hospeda esta página (no modo demonstração, troque de perfil pelo seletor no topo). Aprovações e cadastros valem apenas nesta sessão do navegador —
+        ao recarregar a página tudo volta à base inicial. Os cadastros novos podem ser levados adiante com
+        <b>Exportar cadastros</b> (admin) ou baixando a ficha <code>.md</code> de cada um.
+      </div>
+    </div>
+    <div class="mo-ft"><button class="btn-p" onclick="fechar('m-ajuda')">Entendi</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL INICIAIS ═══════════════════ -->
+<div class="mbg" id="m-ini" onclick="if(event.target===this)fechar('m-ini')">
+  <div class="mo" style="max-width:430px">
+    <div class="mo-hd">
+      <div><h2>Suas iniciais</h2><div class="mo-sub">É assim que você aparece como Resp. nos cards</div></div>
+      <button class="mo-x" onclick="fechar('m-ini')">✕</button>
+    </div>
+    <div class="mo-bd">
+      <div class="ferr" id="ini-err"></div>
+      <div class="fi"><label>Iniciais</label>
+        <input type="text" id="i-ini" maxlength="4" onkeydown="if(event.key==='Enter')salvarIniciais()"
+          style="text-transform:uppercase;font-size:18px;font-weight:700;letter-spacing:2px;width:130px">
+        <div class="hint" id="ini-hint"></div></div>
+    </div>
+    <div class="mo-ft">
+      <button class="btn-p" onclick="salvarIniciais()">Salvar</button>
+      <button class="btn-s" onclick="usarIniciaisPadrao()">Usar a sugestão</button>
+      <button class="btn-s" onclick="fechar('m-ini')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   REPOSITÓRIO DE SKILLS — Gradus Consultoria
+   Base inicial: lista corrida GRA500 "Desenvolvimentos de AI" (29/05/2026)
+   Protótipo sem servidor: login, aprovações e cadastros vivem na memória da sessão.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CATEGORIAS — para que a skill serve (define a cor do card)
+   Para renomear, trocar a cor ou incluir uma categoria, basta editar esta lista.
+   O "id" é o que fica gravado em cada skill (BASE, cadastros, exportação JSON):
+   ao renomear, mude só o "nome" e mantenha o id — nada mais precisa mudar.
+   A ordem da lista é a ordem dos filtros, do formulário e do agrupamento.
+   ══════════════════════════════════════════════════════════════════════════ */
+const CATEGORIAS = [
+  {id:'analises',     nome:'Análises',                   cor:'#296DB7', bg:'#EDF3FA',
+   desc:'Tratam a base do cliente e entregam diagnóstico, painel ou modelo.'},
+  {id:'apresentacoes',nome:'Apresentações',              cor:'#E68E18', bg:'#FEF7EC',
+   desc:'Montam storyline, slides ou deck pronto para apresentar.'},
+  {id:'padroes',      nome:'Padrões e Qualidade',        cor:'#1F7A8C', bg:'#E9F4F6',
+   desc:'Revisam entregáveis contra o padrão e o controle de qualidade Gradus.'},
+  {id:'referencias',  nome:'Referências e Conhecimento', cor:'#15497F', bg:'#EEF2F8',
+   desc:'Trazem referências, benchmarks e contexto de projetos passados da Gradus.'},
+  {id:'gestao',       nome:'Gestão de Projeto',          cor:'#00893F', bg:'#EBF6EF',
+   desc:'Apoiam cronograma, coleta de informações e acompanhamento do projeto.'},
+  {id:'sistemas',     nome:'Sistemas',                   cor:'#5C7EA8', bg:'#F1F4F9',
+   desc:'Ligadas aos sistemas Gradus Tech (Matrix, Arbor...) — protótipos e sugestões de melhoria.'}
+];
+/* fallback: skills sem categoria ou com categoria que não existe mais na lista */
+const CAT_SEM = {id:'sem', nome:'Sem categoria', cor:'#7B8EA0', bg:'#F5F6F8',
+   desc:'Ainda não classificada — o responsável ou a Gestão Metodológica define.'};
+/* aceita o id ('analises') ou o nome ('Análises', vindo da planilha) */
+function catDe(v){
+  const s=txt(v); if(!s) return CAT_SEM;
+  return CATEGORIAS.find(c=>c.id===s || slug(c.nome)===slug(s)) || CAT_SEM;
+}
+function catsTodas(){ return CATEGORIAS.concat([CAT_SEM]); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FONTES — de onde a skill veio (bolha ao lado do estágio no card)
+   Mesma lógica das categorias: o "id" fica gravado na skill; sigla, nome e
+   cores podem ser trocados aqui sem mexer em mais nada.
+   ══════════════════════════════════════════════════════════════════════════ */
+const FONTES = [
+  {id:'org',  sigla:'ORG',  nome:'Organização',        bg:'#FDF3E3', cor:'#B36E0C', borda:'rgba(230,142,24,.55)',
+   alias:['organizacao','gradus','oficial'],
+   desc:'Skill oficial da Gradus, curada pela Gestão Metodológica. Só o admin marca uma skill como ORG.'},
+  {id:'cons', sigla:'CONS', nome:'Consultor',          bg:'#E5EFF7', cor:'#25597F', borda:'rgba(48,111,159,.45)',
+   alias:['consultor','consultora'],
+   desc:'Desenvolvida por um consultor da Gradus para uso em projeto.'},
+  {id:'ext',  sigla:'EXT',  nome:'Externa (internet)', bg:'#E5F7EC', cor:'#00893F', borda:'rgba(0,176,80,.45)',
+   alias:['externa','externo','internet','web'],
+   desc:'Trazida da internet ou de terceiros e adaptada para uso na Gradus.'}
+];
+const FONTE_PADRAO = FONTES[1];   /* sem informação = Consultor */
+/* aceita id, sigla, nome ou apelido (vindo da planilha): 'org', 'ORG', 'Organização', 'internet'... */
+function fonteDe(v){
+  const s=slug(txt(v)); if(!s || s==='skill') return FONTE_PADRAO;
+  return FONTES.find(o=>o.id===s || slug(o.sigla)===s || slug(o.nome)===s || o.alias.includes(s)) || FONTE_PADRAO;
+}
+function fonteCss(id){ const o=fonteDe(id); return 'background:'+o.bg+';color:'+o.cor+';border-color:'+o.borda; }
+function fontePill(id){ const o=fonteDe(id);
+  return '<span class="pill fonte" style="'+fonteCss(id)+'" title="Fonte: '+htm(o.nome)+'">'+htm(o.sigla)+'</span>'; }
+
+const BASE = [
+ {c:'analises',m:'OM',amp:3,d:'Pacote de Viagens',t:'HTML',r:'GB',hr:2,q:null,e:'MVP1',
+  esc:'Realiza as análises do pacote de viagens',
+  ex:'Você recebe a base de dados do cliente e utiliza a skill para ter uma primeira versão da análise já com alto nível de polimento'},
+ {c:'analises',m:'OM',amp:3,d:'Análise de Refeitório',t:'HTML',r:'PB',hr:1,q:null,e:'MVP1',
+  esc:'Realiza a análise de refeitório, quebrando em custo e consumo de fator',
+  ex:'Você recebe a base de dados do cliente e utiliza a skill para ter uma primeira versão da análise já com alto nível de polimento'},
+ {c:'analises',m:'OM',amp:3,d:'Análise de Horas Extras',t:'HTML',r:'PB',hr:2,q:null,e:'MVP1',
+  esc:'Realiza a análises de horas extras a partir da base realizada do cliente',
+  ex:'Você recebe a base de dados do cliente e utiliza a skill para ter uma primeira versão da análise já com alto nível de polimento'},
+ {c:'analises',m:'OM',amp:2,d:'Skill de Fatos Velhos',t:'Skill',r:'VC',hr:1,q:null,e:'WIP',
+  esc:'Identifica e aponta fatos velhos na base do cliente',
+  ex:'Você recebe o razão contábil do cliente e precisa identificar quais gastos não são recorrentes para análises'},
+ {c:'sistemas',m:'OM',amp:2,d:'Prompt de melhoria do Matrix',t:'Skill',r:'JM (GH)',hr:2,q:null,e:'WIP',
+  esc:'Envia sugestão de novas funcionalidades para o Matrix a partir de mock up no Claude',
+  ex:'Você faz um vibe coding no Claude de uma funcionalidade no Matrix, até testar o keyway no jenkins, daí você envia para a Tech e eles sobem'},
+ {c:'apresentacoes',m:'OM',amp:1,d:'Construtor de apresentações - (Ex storyline)',t:'Skill',r:'MU',hr:4,q:null,e:'WIP',
+  esc:'Constrói o storyline completo para o consultor no formato OM, resultando em um HTML/PPT pronto para apresentar na DO ou para o Dono do Pacote',
+  ex:'Você fez uma análise não padrão e precisa criar uma apresentação dela'},
+ {c:'analises',m:'OM',amp:2,d:'Acompanhamento light (Matrix light)',t:'HTML',r:'VI',hr:4,q:null,e:'MVP1',
+  esc:'Cria uma Matrix com comparação de orçado x realizado com visão de desvios do mês, acumulado e tendência',
+  ex:'O cliente envia uma base de realizado e você utiliza a skill para ter os primeiros insights rapidamente'},
+ {c:'analises',m:'OM',amp:3,d:'Pacote de Aluguéis',t:'HTML',r:'LP',hr:2,q:null,e:'MVP1',
+  esc:'Criar um HTML com as principais análises de aluguel com input padronizado. O usuário carrega uma base de custos por ímovel e o painel já carrega as principais análises',
+  ex:'Você recebe a base de dados do cliente e utiliza a skill para ter uma primeira versão da análise já com alto nível de polimento'},
+ {c:'analises',m:'OM',amp:2,d:'Classificador de fornecedores',t:'Skill',r:'MU',hr:2,q:null,e:'WIP',
+  esc:'Classifica os fornecedores existentes do cliente a partir de uma base de realizado',
+  ex:'Você recebe o razão contábil do cliente e precisa identificar quais são os principais fornecedores e quais são seus motivos de contratação'},
+ {c:'analises',m:'OM',amp:3,d:'Modelo preditivo de assuntos',t:'Skill',r:'TB',hr:2,q:null,e:'WIP',
+  esc:'Recebe base de processos, a trata e define um recorte, junto ao consultor, para em seguida testar técnicas e hiperparâmetros, devolvendo um modelo, dados classificados e apresentação pronta',
+  ex:'Você recebe a base de dados do cliente e utiliza a skill para ter uma primeira versão da análise já com alto nível de polimento'},
+ {c:'referencias',m:'OM',amp:1,d:'Consulting references (OM)',t:'PPR',r:'LP',hr:4,q:null,e:'MVP1',
+  esc:'Retorna referências para uso em projeto advindas de experiências passadas da Gradus em OM',
+  ex:'Você precisa saber qual nível de plano de saúde é fornecido para gestores em média'},
+
+ {c:'gestao',m:'TO',amp:1,d:'Gestão de cronograma',t:'HTML',r:'TB',hr:2,q:null,e:'MVP2',
+  esc:'Permite a gestão de cronograma e controle de farol, inclusive auxiliando no disparo de e-mails',
+  ex:'Você precisa entender qual o próximo passo para que o projeto esteja "nos trilhos"'},
+ {c:'apresentacoes',m:'TO',amp:2,d:'Gerador de slides - Desenho estratégico',t:'PPR',r:'AL',hr:4,q:null,e:'MVP2',
+  esc:'Permite que os consultores façam slides de desenho estratégico em TO, com organogramas iniciais, lista de movimentos, excel de movimentos e resumo executivo as is - to be',
+  ex:'Você precisa fazer os slides de desenho estratégico já com uma definição das movimentações'},
+ {c:'analises',m:'TO',amp:2,d:'Acompanhamento de Pessoal',t:'HTML',r:'FA',hr:2,q:null,e:'WIP',
+  esc:'Retorna a visão de acompanhamento de um projeto de TO mês a mês',
+  ex:'Você recebe a base realizada de pessoal para fazer o acompanhamento do mês'},
+ {c:'sem',m:'TO',amp:2,d:'Arquivamento de metadados',t:'Skill',r:'DQ',hr:null,q:null,e:'WIP',
+  esc:'???',
+  ex:'???'},
+ {c:'referencias',m:'TO',amp:2,d:'Apoio ao Desenho estratégico',t:'Skill',r:'DQ',hr:3,q:null,e:'MVP1',
+  esc:'Faz uma primeira visão de desenho estratégico com base em projetos históricos da Gradus',
+  ex:'Você acaba de entrar no cliente e precisa entender se as primeiras hierarquias da empresa estão bem distribuídas'},
+ {c:'analises',m:'TO',amp:2,d:'Acompanhamento SQUADS',t:'HTML',r:'OS',hr:null,q:null,e:'MVP1',
+  esc:'Retorna a visão de acompanhamento das squads de um cliente mês a mês',
+  ex:'Você recebe a base realizada de squads para fazer o acompanhamento do mês'},
+ {c:'gestao',m:'TO',amp:2,d:'Censo de posições',t:'HTML',r:'IC',hr:1,q:null,e:'MVP1',
+  esc:'Coleta junto ao cliente com edição interativa as posições existentes na companhia',
+  ex:'Você precisa entender melhor quais são as posições existentes no cliente'},
+ {c:'gestao',m:'TO',amp:2,d:'Censo de processos',t:'HTML',r:'TB',hr:1,q:null,e:'MVP1',
+  esc:'Coleta junto ao cliente com edição interativa os processos, descrição, mapeamento LJE e definição de responsáveis',
+  ex:'Você precisa entender melhor quais são os processos existentes no cliente'},
+ {c:'referencias',m:'TO',amp:1,d:'Consulting references (TO - Liderança)',t:'PPR',r:'DQ',hr:3,q:null,e:'MVP1',
+  esc:'Retorna referências para uso em projeto advindas de experiências passadas da Gradus de Liderança de TO',
+  ex:'Você precisa saber qual o span médio em outras empresas de uma área do cliente'},
+ {c:'referencias',m:'TO',amp:1,d:'Consulting references (TO - Dimensionamento)',t:'PPR',r:'DQ',hr:3,q:null,e:'MVP2',
+  esc:'Retorna referências para uso em projeto advindas de experiências passadas da Gradus de Dimensionamento de TO',
+  ex:'Você precisa saber quantas pessoas em média outras emrpesas têm em uma função no cliente'},
+ {c:'sistemas',m:'TO',amp:1,d:'Prompt de melhoria do Arbor',t:'Skill',r:'JM',hr:2,q:null,e:'WIP',
+  esc:'Envia sugestão de novas funcionalidades para o Arbor a partir de mock up no Claude',
+  ex:'Você faz um vibe coding no Claude de uma funcionalidade no Arbor, até testar o keyway no jenkins, daí você envia para a Tech e eles sobem'},
+ {c:'analises',m:'TO',amp:3,d:'Carteirizador FA',t:'Python',r:'FA',hr:1,q:null,e:'MVP1',
+  esc:'Otimiza carteiras pelo método de Kmeans, a partir de um input de lat, long, frequência de visitas e tempo por visita',
+  ex:'Você precisa saber quantos operadores são exigidos para atenderem um número determinado de postos'},
+ {c:'analises',m:'TO',amp:3,d:'Carterizador AL',t:'HTML',r:'AL',hr:1,q:null,e:'MVP1',
+  esc:'Otimiza carteiras pelo método de Kmeans, a partir de um input de lat, long, frequência de visitas e tempo por visita',
+  ex:'Você precisa saber quantos operadores são exigidos para atenderem um número determinado de postos'},
+ {c:'analises',m:'TO',amp:3,d:'Erlang',t:'HTML',r:'AL',hr:2,q:null,e:'MVP1',
+  esc:'Roda o algoritmo de Erlang e otimizador de turnos a partir de um input de demanda por faixa horária',
+  ex:'Você precisa saber quantos atendentes deveriam estar no call center com base em seu número de chamados'},
+ {c:'analises',m:'TO',amp:2,d:'Classificador de frentes e blocos padrão',t:'HTML/Skill',r:'FA',hr:2,q:null,e:'WIP',
+  esc:'Classifica frentes e blocos padrão a partir da base de pessoal do cliente',
+  ex:'Você recebe a base de pessoal do cliente e precisa saber qual seria uma visão inicial de quebra em frentes e blocos de análise'},
+ {c:'analises',m:'TO',amp:2,d:'Custo de Fator',t:'HTML/Skill',r:'LG',hr:3,q:null,e:'WIP',
+  esc:'Realiza a análise de custo de fator para as posições do cliente com base no Remuneratio',
+  ex:'Você precisa saber qual deveria ser o salário para um analista júnior de RH no cliente'},
+
+ {c:'analises',m:'MPC',amp:null,d:'Ferramenta de Diagnóstico Comercial',t:'StreamLit',r:'VC',hr:null,q:null,e:'WIP',
+  esc:'Realiza o Diagnóstico Comercial de um novo lead',
+  ex:'Você é o Elias e recebe uma ligação de uma nova empresa querendo um projeto'},
+
+ {c:'gestao',m:'PMI',amp:null,d:'HUB de acompanhamento de forças tarefas',t:'PPR',r:'CC',hr:null,q:null,e:'MVP1',
+  esc:'???',
+  ex:'???'},
+
+ {c:'referencias',m:'Geral',amp:1,d:'Contexto Gradus',t:'Skill',r:'GH',hr:1,q:3,e:'WIP',
+  esc:'Fornece o contexto Gradus, histórico de projetos, materiais institucionais, kick offs metodológicos, exemplos de TO e exemplos de OM',
+  ex:'Você precisa que o Claude te dê uma resposta que é conectada ao conhecimento específico da Gradus'},
+ {c:'padroes',m:'Geral',amp:1,d:'Grading de análise',f:'org',link:'Skill da organização no Claude: gradus-grading-analise',t:'Skill',r:'GH',hr:2,q:4,e:'MVP1',
+  esc:'Avalia análises produzidas quanto ao perímetro, estrutura, diagnóstico, contexto, recomendação, etc',
+  ex:'Você finalizou uma análise e quer polí-la antes de discutir com o SLP'},
+ {c:'padroes',m:'Geral',amp:1,d:'PPT Reviewer',f:'org',link:'Skill da organização no Claude: gradus-pptx-reviewer',t:'Skill',r:'GH',hr:4,q:4,e:'MVP1',
+  esc:'Avalia apresentações produzidas para que estejam de acordo com o controle de qualidade da Gradus',
+  ex:'Você finalizou um material e quer polí-lo antes de apresentar para o SLP'},
+
+ /* skills da organização (Input/Skills_organizacao) que não estavam na lista corrida GRA500.
+    Responsável, estágio e impactos a confirmar com a Gestão Metodológica. */
+ {c:'analises',m:'Geral',amp:1,d:'Ferramentas HTML no padrão Gradus',f:'org',t:'Skill',r:'—',hr:null,q:null,e:'MVP1',
+  esc:'Cria ferramentas HTML interativas no padrão visual Gradus — dashboards, calculadoras e trackers que recebem a base do projeto e apresentam os resultados',
+  ex:'Você quer transformar uma análise de Excel ou PPT em uma ferramenta interativa',
+  link:'Skill da organização no Claude: gradus-consultant-frontend', obs:'Responsável a confirmar'},
+ {c:'apresentacoes',m:'Geral',amp:1,d:'HTML embutido no PowerPoint',f:'org',t:'Skill',r:'—',hr:null,q:null,e:'MVP1',
+  esc:'Cria visualizações HTML interativas no formato certo para serem embutidas em um slide pelo add-on da Gradus — sem título nem rolagem, ocupando só a área de conteúdo',
+  ex:'Você quer um gráfico interativo dentro do próprio slide da apresentação',
+  link:'Skill da organização no Claude: gradus-consultant-pptx-embed', obs:'Responsável a confirmar'},
+ {c:'gestao',m:'Geral',amp:1,d:'EPR Builder',f:'org',t:'Skill',r:'—',hr:null,q:null,e:'MVP1',
+  esc:'Conduz a sessão guiada de Engagement Performance Review com o sócio, ancorada em EPRs anteriores e na apostila de critérios, e gera o Excel final do EPR',
+  ex:'Você precisa fechar a avaliação de um consultor ao fim do projeto',
+  link:'Skill da organização no Claude: gradus-epr-builder', obs:'Responsável a confirmar'},
+ {c:'sistemas',m:'Geral',amp:1,d:'Protótipos dos sistemas Gradus',f:'org',t:'Skill',r:'—',hr:null,q:null,e:'MVP1',
+  esc:'Gera protótipos HTML fiéis aos sistemas Gradus Tech (Matrix, Arbor, Gens, Cognitus, Nexus, FPA) para visualizar uma melhoria antes de desenvolvê-la',
+  ex:'Você quer mostrar como ficaria uma nova funcionalidade no Matrix antes de levar para a Tech',
+  link:'Skill da organização no Claude: gradus-prototipo-sistemas', obs:'Responsável a confirmar'}
+];
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   INTEGRAÇÃO — USUÁRIO LOGADO
+   A página não faz login: quem autentica é a aplicação que a hospeda.
+   ÚNICO ponto de leitura do usuário: obterUsuarioAtual(). O resto do código
+   usa apenas a variável USUARIO, preenchida por carregarUsuario() a partir dela.
+
+   Contrato esperado (objeto devolvido pela aplicação):
+     { nome:     'Luiz Ramos',                           // exibido no topo
+       email:    'luiz.ramos@gradusconsultoria.com.br',  // identifica o autor das sugestões
+       iniciais: 'LR',                                   // opcional: sem ela, sugere 2 letras do nome (a pessoa pode trocar)
+       papel:    'admin' | 'consulta' }                  // admin = Gestão Metodológica
+
+   Onde o usuário é usado: cabeçalho (nome, iniciais, papel) · permissão de
+   editar/aprovar/exportar (papel) · aba "Minhas sugestões" (email) · autor e
+   owner, criador e última modificação das skills (email + iniciais).
+   ══════════════════════════════════════════════════════════════════════════ */
+/* Integração com o PPR (ferramenta freeform): o PPR carrega esta página num iframe e,
+   ao terminar de carregar, envia postMessage {type:'ppr.init', payload:{user:{email,nome,is_staff}, ...}}.
+   Só aceitamos a mensagem vinda da janela-mãe e de uma das origens abaixo.
+   Fora do PPR a página não inicia; para testar sem o PPR, abrir com ?demo=1. */
+const PPR_ORIGENS = ['https://ppr.gradusanalytics.com.br', 'https://pprdev.gradusanalytics.com.br'];
+/* Quem é admin (Gestão Metodológica) na ferramenta. A definir — enquanto vazia, todos entram como consulta.
+   Atenção: a checagem é só no navegador; não é controle de acesso de verdade. */
+const ADMINS_EMAILS = [];
+const MODO_DEMO = /[?&]demo=1(&|$)/.test(location.search);   /* seletor de perfil fictício, só para testes */
+const USUARIOS_DEMO = [
+ {nome:'Gestão Metodológica', email:'gestao.metodologica@gradusconsultoria.com.br', iniciais:'GM', papel:'admin'},
+ {nome:'Consultor Gradus',    email:'consultor.gradus@gradusconsultoria.com.br',                   papel:'consulta'},
+ /* owners fictícios para testar a aprovação de versões — GH e LP são Resp. de skills da base */
+ {nome:'Owner GH (demo)',     email:'owner.gh@demo.local',                          iniciais:'GH', papel:'consulta'},
+ {nome:'Owner LP (demo)',     email:'owner.lp@demo.local',                          iniciais:'LP', papel:'consulta'}
+];
+let DEMO_IDX = 0;
+
+function obterUsuarioAtual(){
+  /* INTEGRAÇÃO: substituir pelo contexto da aplicação, ex.:
+       return window.APP_CONTEXT.usuario;
+     Alternativa sem mexer aqui: a aplicação define window.GRADUS_USUARIO
+     (mesmo contrato acima) antes de carregar a página.
+     Se o usuário vier por API assíncrona, tornar carregarUsuario()/iniciar() async. */
+  if(window.GRADUS_USUARIO) return window.GRADUS_USUARIO;
+  return MODO_DEMO ? USUARIOS_DEMO[DEMO_IDX] : null;
+}
+
+/* ── iniciais: sugeridas pelo nome (2 letras) e editáveis pela própria pessoa ──
+   Na Gradus as iniciais nem sempre são as primeiras letras do nome: a pessoa troca
+   clicando nas iniciais no topo. INTEGRAÇÃO: gravar a escolha no perfil do usuário
+   (backend); no protótipo ela fica guardada só neste navegador. */
+const CHAVE_INICIAIS = 'gradus-repo-skills:iniciais';
+let INI_PREF = {};
+try{ INI_PREF = JSON.parse(localStorage.getItem(CHAVE_INICIAIS)||'{}') || {}; }catch(e){}
+function normIni(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,''); }
+function iniciaisSugeridas(nome, email){
+  const conect=['DE','DA','DO','DAS','DOS','E'];
+  let p=String(nome||'').split(/\s+/).map(normIni).filter(w=>w && !conect.includes(w));
+  if(!p.length) p=String(email||'').split('@')[0].split(/[._-]+/).map(normIni).filter(Boolean);
+  if(!p.length) return '??';
+  return p.length>1 ? p[0][0]+p[p.length-1][0] : p[0].slice(0,2);
+}
+/* Diretório de pessoas (email -> nome e iniciais).
+   INTEGRAÇÃO: vir do cadastro de usuários da aplicação (inclui as iniciais escolhidas por cada um). */
+function diretorio(){ return MODO_DEMO ? USUARIOS_DEMO : (window.GRADUS_USUARIO ? [window.GRADUS_USUARIO] : []); }
+function iniciaisDe(email, fallback){
+  email=String(email||'').toLowerCase();
+  if(email && INI_PREF[email]) return INI_PREF[email];
+  const g=window.GRADUS_USUARIO, u=diretorio().find(p=>p.email===email)
+       || (g && String(g.email||'').toLowerCase()===email ? g : null);
+  if(u) return normIni(u.iniciais) || iniciaisSugeridas(u.nome, email);
+  return fallback || (email ? iniciaisSugeridas('', email) : '—');
+}
+function pessoaPorIniciais(ini){
+  const s=normIni(ini); if(!s) return null;
+  return diretorio().find(u=>iniciaisDe(u.email)===s) || null;
+}
+function loginDoEmail(email){ return String(email||'').split('@')[0]; }   /* nome.sobrenome */
+function pessoaTxt(p){
+  if(!p) return '—';
+  if(p.email) return loginDoEmail(p.email);
+  return (p.iniciais && p.iniciais!=='—') ? p.iniciais+' (sem email vinculado)' : '—';
+}
+function pessoaAtual(){ return {email:USUARIO.email, iniciais:USUARIO.iniciais}; }
+
+function carregarUsuario(){
+  const u = obterUsuarioAtual() || {};
+  const email = String(u.email||'').trim().toLowerCase();
+  const nome  = String(u.nome||email||'Usuário').trim();
+  const iniciais = INI_PREF[email] || normIni(u.iniciais) || iniciaisSugeridas(nome, email);
+  USUARIO = { nome, email, iniciais, papel: u.papel==='admin' ? 'admin' : 'consulta' };
+  return USUARIO;
+}
+function abrirIniciais(){
+  document.getElementById('i-ini').value=USUARIO.iniciais;
+  document.getElementById('ini-hint').innerHTML='Sugestão a partir do seu nome: <b>'+htm(iniciaisSugeridas(USUARIO.nome,USUARIO.email))
+    +'</b>. Use de 2 a 4 letras.';
+  document.getElementById('ini-err').className='ferr';
+  document.getElementById('m-ini').classList.add('show');
+  setTimeout(()=>{ const el=document.getElementById('i-ini'); el.focus(); el.select(); },60);
+}
+function salvarIniciais(){
+  const novo=normIni(document.getElementById('i-ini').value), err=document.getElementById('ini-err');
+  const falha=m=>{ err.className='ferr show'; err.textContent=m; };
+  if(novo.length<2 || novo.length>4) return falha('Use de 2 a 4 letras.');
+  const outro=diretorio().find(u=>u.email!==USUARIO.email && iniciaisDe(u.email)===novo);
+  if(outro) return falha(novo+' já são as iniciais de '+loginDoEmail(outro.email)+'.');
+  if(ITENS.some(x=>x.owner && !x.owner.email && normIni(x.owner.iniciais)===novo))
+    return falha(novo+' já aparece como Resp. de skills do repositório. Escolha outras iniciais.');
+  INI_PREF[USUARIO.email]=novo; gravarIniciais(); aplicarIniciais();
+}
+function usarIniciaisPadrao(){ delete INI_PREF[USUARIO.email]; gravarIniciais(); aplicarIniciais(); }
+function gravarIniciais(){ try{ localStorage.setItem(CHAVE_INICIAIS, JSON.stringify(INI_PREF)); }catch(e){} }
+function aplicarIniciais(){
+  carregarUsuario();
+  ITENS.forEach(x=>{ [x.owner,x.criador,x.ultMod].forEach(p=>{ if(p && p.email===USUARIO.email) p.iniciais=USUARIO.iniciais; }); derivar(x); });
+  fechar('m-ini'); pintarUsuario(); montarChips(); render();
+  toast('Suas iniciais agora são <b>'+htm(USUARIO.iniciais)+'</b>.','ok');
+}
+
+const FONTE_LABEL = 'Repositório de Skills Gradus · base inicial GRA500 “Desenvolvimentos de AI” (29/05/2026)';
+const AMP_LBL = {1:'1 — Geral Gradus',2:'2 — Geral na metodologia',3:'3 — Análise'};
+const IMP_LBL = {1:'1 — Baixo',2:'2 — Médio',3:'3 — Alto',4:'4 — Muito alto'};
+const ORD_MET = ['OM','TO','MPC','PMI','Geral','Comercial'];
+const ORD_EST = ['WIP','MVP1','MVP2'];
+const OPC_TIPO = ['HTML','Skill','PPR','Python','StreamLit','HTML/Skill','Outro'];
+const EST_META = {
+  'WIP' :{pill:'pa', cor:'#E68E18', cls:'wip', disp:'Em desenvolvimento', desc:'Em construção, ainda não liberada para uso amplo'},
+  'MVP1':{pill:'pt', cor:'#306F9F', cls:'mvp1',disp:'Disponível',          desc:'Primeira versão utilizável, já disponível'},
+  'MVP2':{pill:'pok',cor:'#00B050', cls:'mvp2',disp:'Disponível',          desc:'Segunda iteração, escopo ampliado'},
+  '—'   :{pill:'pg', cor:'#9DB1CF', cls:'',    disp:'Não informado',       desc:'Estágio não registrado'}
+};
+const TIPO_DESC = {
+  'HTML':'Ferramenta web autossuficiente: abre no navegador, o consultor carrega a base e usa filtros, gráficos e exportações.',
+  'Skill':'Skill do Claude — instruções empacotadas que o consultor invoca no chat para produzir o entregável.',
+  'PPR':'Entrega publicada na plataforma PPR, acessível aos consultores em produção.',
+  'Python':'Motor/script Python executado localmente sobre a base do projeto.',
+  'StreamLit':'Aplicação Streamlit servida para uso interativo.',
+  'HTML/Skill':'Combinação: ferramenta HTML orquestrada por uma skill do Claude.',
+  'Outro':'Formato a documentar pelo responsável.'
+};
+const NDOC = '_Não documentado — a preencher pelo responsável._';
+
+let ITENS = [], SEQ = 1, USUARIO = null, VIEW = 'disp', EDIT_ID = null, DET_ID = null, DET_ABA = 'ficha', VER_ID = null;
+const F = {cats:new Set(), mets:new Set(), ests:new Set(), fontes:new Set()};
+
+/* ── utilidades ───────────────────────────────────────────────────────── */
+function htm(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function txt(v){ const s=String(v==null?'':v).trim(); return (s==='-'||s==='—'||s==='n/a')?'':s; }
+function num(v){ const n=parseFloat(v); return isNaN(n)?null:n; }
+function pct(v,t){ return t?Math.round(v/t*100):0; }
+function slug(s){ return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60) || 'skill'; }
+function linhas(s){ return txt(s).split(/\r?\n|\s*\|\s*|\s*;\s*/).map(x=>x.trim()).filter(Boolean); }
+function hoje(){ return new Date().toLocaleDateString('pt-BR'); }
+function byId(id){ return ITENS.find(x=>x.id===id); }
+function isAdmin(){ return !!USUARIO && USUARIO.papel==='admin'; }
+function toast(msg,tipo){
+  const t=document.getElementById('toast');
+  t.className='toast show '+(tipo||''); t.innerHTML=msg;
+  clearTimeout(window._tt); window._tt=setTimeout(()=>{t.className='toast '+(tipo||'')},3800);
+}
+
+/* ── modelo ───────────────────────────────────────────────────────────── */
+/* Pessoas numa skill: owner (= Resp., quem teve a última versão aprovada), criador (quem cadastrou)
+   e ultMod (quem mexeu por último). Todas guardadas como {email, iniciais}. */
+/* campos que definem uma versão da ficha (entram no snapshot do histórico e na proposta) */
+const CAMPOS_VERSAO = ['d','c','f','m','t','e','amp','hr','q','esc','inp','out','uso','ex','com','link','repo','obs'];
+function snapshotDe(x){ const o={}; CAMPOS_VERSAO.forEach(k=>{ o[k]=x[k]; }); return o; }
+function iniciarHistorico(x, notas, autor, data){
+  x.versao=1;
+  x.historico=[{versao:1, data:data||x.criado, autor:Object.assign({}, autor||x.owner), notas:notas||'Versão inicial',
+                arquivo:x.arquivoNovo||null, snapshot:snapshotDe(x)}];   /* arquivo enviado no cadastro vira o da v1 */
+}
+/* base e planilha só trazem as iniciais do Resp.: tenta achar a pessoa no diretório */
+function donoPorIniciais(r){ const ini=txt(r)||'—', p=pessoaPorIniciais(ini); return {email:p?p.email:'', iniciais:ini}; }
+function respIni(x){ const o=x.owner||{}; return (o.email ? iniciaisDe(o.email, o.iniciais) : o.iniciais) || '—'; }
+
+function mkItem(o, status, autor){
+  const it = {
+    id: SEQ++, c:catDe(o.c).id, f:fonteDe(o.f).id, m:txt(o.m)||'—', amp:num(o.amp), d:txt(o.d), t:txt(o.t)||'Outro', r:txt(o.r)||'—',
+    hr:num(o.hr), q:num(o.q), e:txt(o.e)||'—',
+    esc:txt(o.esc), ex:txt(o.ex), com:txt(o.com), como:txt(o.como), obs:txt(o.obs),
+    inp:txt(o.inp), out:txt(o.out), uso:txt(o.uso), link:txt(o.link), repo:txt(o.repo),
+    status: status||'aprovada', autor: autor||txt(o.r)||'—', autorEmail: o.autorEmail||'',
+    avaliacoes: Array.isArray(o.avaliacoes) ? o.avaliacoes.map(a=>Object.assign({},a)) : [],
+    owner: o.owner ? Object.assign({},o.owner) : donoPorIniciais(o.r), versao:null, historico:[], proposta:null,
+    criado: o.criado||hoje(), motivo:'', demo: !!o.demo, origem: o.origem || (status==='aprovada'?'base':'novo')
+  };
+  it.criador = o.criador || Object.assign({}, it.owner, {data:it.criado});
+  it.ultMod  = o.ultMod  || Object.assign({}, it.criador);
+  return derivar(it);
+}
+function derivar(it){
+  it.slug = slug(it.d);
+  it.r    = respIni(it);   /* Resp. exibido = iniciais atuais do owner */
+  it.c    = catDe(it.c).id;
+  it.catL = catDe(it.c).nome;
+  it.f    = fonteDe(it.f).id;
+  it.fonteL = fonteDe(it.f).nome;
+  it.est  = EST_META[it.e] ? it.e : '—';
+  it.disp = EST_META[it.est].disp;
+  it.ampL = it.amp && AMP_LBL[it.amp] ? AMP_LBL[it.amp] : 'Não informada';
+  it.hrL  = it.hr && IMP_LBL[it.hr] ? IMP_LBL[it.hr] : 'Não avaliado';
+  it.qL   = it.q  && IMP_LBL[it.q]  ? IMP_LBL[it.q]  : 'Não avaliado';
+  const nTxt = [it.esc,it.ex,it.com,it.uso,it.inp,it.out].filter(Boolean).length;
+  it.doc  = (it.esc && (it.ex||it.com||it.uso) && it.hr) ? 'ok' : (nTxt ? 'part' : 'pend');
+  it.docL = {ok:'Completa',part:'Parcial',pend:'Pendente'}[it.doc];
+  it.busca = [it.d,it.catL,it.fonteL,fonteDe(it.f).sigla,it.m,it.t,it.r,it.e,it.esc,it.ex,it.com,it.uso,it.inp,it.out,it.link,it.obs].join(' ').toLowerCase();
+  return it;
+}
+function semear(){
+  SEQ=1; ITENS=[];
+  BASE.forEach(o=>{
+    const it=mkItem(Object.assign({criado:'29/05/2026'},o),'aprovada');
+    iniciarHistorico(it,'Versão inicial (lista corrida GRA500)');
+    ITENS.push(it);
+  });
+  if(DEMO_AVALIACOES) semearAvaliacoesDemo();
+  if(DEMO_VERSOES) semearVersoesDemo();
+}
+
+/* ── inicialização / perfil ───────────────────────────────────────────── */
+function iniciar(){
+  carregarUsuario();
+  if(!ITENS.length) semear();   /* mantém cadastros e aprovações ao trocar de perfil (modo demo) */
+  pintarUsuario();
+  VIEW='disp'; limpar(true);
+  montarAdmBar(); montarChips(); render();
+}
+function pintarUsuario(){
+  document.getElementById('me').innerHTML =
+    `<button type="button" class="me-av edit ${isAdmin()?'adm':''}" onclick="abrirIniciais()" title="Suas iniciais — clique para alterar">${htm(USUARIO.iniciais)}</button>
+     <div class="me-t"><div class="me-n">${htm(USUARIO.nome)}</div><div class="me-r">${isAdmin()?'Admin':'Consulta'}</div></div>`;
+  const sw=document.getElementById('demo-sw');
+  if(MODO_DEMO && !window.GRADUS_USUARIO){
+    sw.style.display='flex';
+    sw.innerHTML='Modo demonstração <select onchange="trocarPerfilDemo(this.value)" title="Só para testes — na aplicação o perfil vem do login">'
+      + USUARIOS_DEMO.map((u,i)=>`<option value="${i}" ${i===DEMO_IDX?'selected':''}>${htm(u.nome)} · ${u.papel==='admin'?'Admin':'Consulta'}</option>`).join('')
+      + '</select>';
+  } else sw.style.display='none';
+}
+/* só no modo demonstração: simula outro usuário sem recarregar a página */
+function trocarPerfilDemo(i){
+  DEMO_IDX=+i;
+  ['m-det','m-form','m-ajuda','m-ini'].forEach(id=>fechar(id));
+  iniciar();
+  const q=fila('pend'), n=q.novas.length+q.versoes.length;
+  toast(`Vendo como <b>${htm(USUARIO.nome)}</b> (${isAdmin()?'admin':'consulta'})`
+    + (n ? ` — <b>${n}</b> item(ns) em Pendentes de aprovação.` : '.'));
+}
+
+/* ── filtros / chips ─────────────────────────────────────────────────── */
+/* ── filtros em dropdown: seleção múltipla, com a contagem de skills de cada opção ──
+   A contagem considera a aba atual, a busca e os outros filtros (não o da própria dimensão). */
+const DIMS = [
+  {k:'c', rot:'Categoria',   gen:'as', set:()=>F.cats,   val:x=>x.c,
+   ops:()=>catsTodas().map(c=>({v:c.id, t:c.nome, cor:c.cor}))},
+  {k:'m', rot:'Metodologia', gen:'as', set:()=>F.mets,   val:x=>x.m,
+   ops:()=>{ const u=Array.from(new Set(ITENS.map(x=>x.m).filter(v=>v && v!=='—')));
+             return ORD_MET.filter(m=>u.includes(m)).concat(u.filter(m=>!ORD_MET.includes(m))).map(m=>({v:m, t:m})); }},
+  {k:'e', rot:'Estágio',     gen:'os', set:()=>F.ests,   val:x=>x.est,
+   ops:()=>[['WIP','Em desenvolvimento'],['MVP1','Primeira versão utilizável'],['MVP2','Segunda iteração']].map(([v,t])=>({v, t, b:v}))},
+  {k:'f', rot:'Fonte',       gen:'as', set:()=>F.fontes, val:x=>x.f,
+   ops:()=>FONTES.map(o=>({v:o.id, t:o.nome, b:o.sigla}))}
+];
+let DD_ABERTO = null;   /* dimensão com o painel aberto */
+function passa(x, exceto){
+  const q=(document.getElementById('q').value||'').trim().toLowerCase();
+  return DIMS.every(d=>d.k===exceto || !d.set().size || d.set().has(d.val(x))) && (!q || x.busca.includes(q));
+}
+function marcaOp(d,o){
+  if(d.k==='c') return `<span class="dot" style="background:${o.cor}"></span>`;
+  if(d.k==='e') return `<span class="pill ${EST_META[o.v].pill}">${o.v}</span>`;
+  if(d.k==='f') return fontePill(o.v);
+  return '';
+}
+function ddHTML(d){
+  const set=d.set(), base=visiveis(), aberto=DD_ABERTO===d.k;
+  const ops=d.ops().filter(o=>ITENS.some(x=>d.val(x)===o.v));
+  const sel=ops.filter(o=>set.has(o.v));
+  const valor = !sel.length ? '' : sel.length===1 ? (sel[0].b||sel[0].t) : sel.length+' selecionad'+d.gen;
+  return `<div class="dd ${sel.length?'on':''} ${aberto?'open':''}">
+    <button type="button" class="dd-btn" onclick="toggleDD('${d.k}')" aria-haspopup="listbox" aria-expanded="${aberto}">
+      <span class="dd-l">${d.rot}</span>${valor?`<span class="dd-v">${htm(valor)}</span>`:''}<span class="dd-car">▼</span></button>
+    <div class="dd-pan"><div class="dd-ops" role="listbox" aria-label="${d.rot}">
+      ${ops.map(o=>{ const n=base.filter(x=>passa(x,d.k) && d.val(x)===o.v).length;
+        return `<label class="dd-op ${n?'':'zero'}"><input type="checkbox" data-v="${htm(o.v)}" ${set.has(o.v)?'checked':''}
+          onchange="marcarDD('${d.k}',this.dataset.v,this.checked)">${marcaOp(d,o)}<span class="dd-t">${htm(o.t)}</span><span class="dd-c">${n}</span></label>`;
+      }).join('')}</div>
+      <div class="dd-ft"><button type="button" onclick="limparDD('${d.k}')" ${sel.length?'':'disabled'}>Limpar</button>
+        <span>${sel.length ? sel.length+' de '+ops.length+' selecionad'+d.gen : 'Mostrando tod'+d.gen}</span></div>
+    </div></div>`;
+}
+function montarChips(){
+  document.getElementById('dd-row').innerHTML = DIMS.map(ddHTML).join('');
+  const p=document.querySelector('.dd.open .dd-pan');   /* perto da borda direita: abre para a esquerda */
+  if(p && p.getBoundingClientRect().right > window.innerWidth-8) p.classList.add('dir');
+}
+function dim(k){ return DIMS.find(d=>d.k===k); }
+function toggleDD(k){ DD_ABERTO = DD_ABERTO===k ? null : k; montarChips(); }
+function fecharDD(){ if(DD_ABERTO){ DD_ABERTO=null; montarChips(); } }
+function marcarDD(k,v,on){ const st=dim(k).set(); on ? st.add(v) : st.delete(v); render(); }
+function limparDD(k){ dim(k).set().clear(); render(); }
+document.addEventListener('click', e=>{ if(DD_ABERTO && !e.target.closest('.dd')) fecharDD(); });
+function limpar(silent){
+  F.cats.clear(); F.mets.clear(); F.ests.clear(); F.fontes.clear();
+  const q=document.getElementById('q'); if(q) q.value='';
+  if(!silent){ montarChips(); render(); }
+}
+/* Pendentes de aprovação: o que depende de você (admin: skills novas + versões ORG/sem owner; owner: versões das suas skills).
+   Minhas sugestões: o que você enviou (skills novas e propostas de versão). */
+function fila(v){
+  v=v||VIEW;
+  if(v==='pend') return {
+    novas:   [],   /* skills novas são publicadas direto, sem aprovação */
+    versoes: ITENS.filter(x=>papeisQuePosso(x).length) };
+  return {
+    novas:   [],
+    versoes: ITENS.filter(x=>x.proposta && x.proposta.autor.email===USUARIO.email) };
+}
+function visiveis(){
+  if(VIEW==='disp') return ITENS.filter(x=>x.status==='aprovada');
+  const q=fila(); return q.novas.concat(q.versoes.filter(x=>!q.novas.includes(x)));
+}
+function filtrados(){ return visiveis().filter(x=>passa(x)); }
+
+/* ── recolher filtros (preferência lembrada só neste navegador) ────────── */
+const CHAVE_FILTROS_MIN = 'gradus-repo-skills:filtros-recolhidos';
+let FILTROS_MIN = false;
+try{ FILTROS_MIN = localStorage.getItem(CHAVE_FILTROS_MIN)==='1'; }catch(e){}
+function alternarFiltros(){
+  FILTROS_MIN = !FILTROS_MIN;
+  try{ localStorage.setItem(CHAVE_FILTROS_MIN, FILTROS_MIN?'1':'0'); }catch(e){}
+  pintarBtnFiltros();
+}
+function pintarBtnFiltros(){
+  document.querySelector('.tools').classList.toggle('min', FILTROS_MIN);
+  const n = F.cats.size + F.mets.size + F.ests.size + F.fontes.size;
+  document.getElementById('btn-flt').innerHTML = FILTROS_MIN
+    ? `<span class="arr">▾</span> Filtros${n?` <span class="bdg" title="${n} filtro(s) ativo(s)">${n}</span>`:''}`
+    : `<span class="arr">▾</span> Recolher filtros`;
+  /* recolhido: resumo do que está sendo exibido, já que a aba e a contagem ficam ocultas */
+  document.getElementById('flt-res').innerHTML = document.getElementById('cnt').innerHTML
+    + (VIEW!=='disp' ? ` · <b>${VIEW==='pend'?'Pendentes de aprovação':'Minhas sugestões'}</b>` : '');
+}
+
+/* ── barra admin / ações globais ─────────────────────────────────────── */
+function montarAdmBar(){
+  document.getElementById('adm-bar').innerHTML =
+    `<button class="btn-sm" onclick="baixarPacote()">⬇ Pacote .md dos filtrados</button>` + (isAdmin()
+    ? `<button class="btn-sm" onclick="expCadastros()">⬇ Exportar cadastros (.json)</button>
+       <button class="btn-sm" onclick="expCatalogo()">⬇ Catálogo (.csv)</button>
+       <label class="btn-sm" for="f-base" style="display:inline-flex;align-items:center">⬆ Atualizar base (lista corrida)</label>
+       <input type="file" id="f-base" accept=".csv,.xlsx,.xls" onchange="handleFile(this)">` : '');
+}
+
+/* ── render ───────────────────────────────────────────────────────────── */
+function montarSeg(){
+  const nDisp=ITENS.filter(x=>x.status==='aprovada').length;
+  const p=fila('pend'), m=fila('minhas'), nP=p.novas.length+p.versoes.length, nM=m.novas.length+m.versoes.length;
+  document.getElementById('seg').innerHTML =
+    `<button class="${VIEW==='disp'?'on':''}" onclick="irView('disp')">Disponíveis <span class="n">${nDisp}</span></button>
+     <button class="${VIEW==='pend'?'on':''}" onclick="irView('pend')">Pendentes de aprovação <span class="n ${nP?'hot':''}">${nP}</span></button>
+     <button class="${VIEW==='minhas'?'on':''}" onclick="irView('minhas')">Minhas sugestões <span class="n">${nM}</span></button>`;
+}
+function irView(v){ VIEW=v; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function notaHTML(x){
+  const M=EST_META[x.est], C=catDe(x.c), desc=x.esc||x.uso||x.out||x.ex||x.com||x.obs;
+  const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
+  let acoes = `<button class="btn-dl" onclick="baixarMd(${x.id})">⬇ Baixar .md</button>
+               <button class="btn-gh" onclick="abrirDet(${x.id})">Ver ficha</button>`;
+  let flag='';
+  if(x.status==='pendente') flag=`<div class="pit-flag">⏳ <b>Aguardando aprovação</b> da Gestão Metodológica · sugerida por ${htm(pessoaTxt(x.criador))} em ${htm(x.criado)}${x.demo?' · <b>exemplo de demonstração</b>':''}</div>`;
+  if(x.status==='recusada') flag=`<div class="pit-flag" style="border-color:rgba(128,0,0,.28)">✕ <b style="color:#800000">Recusada</b>${x.motivo?' — '+htm(x.motivo):''}</div>`;
+  return `<div class="pit" style="background:${C.bg}">
+    <div class="fold"></div>
+    <div class="pit-acc" style="background:${C.cor}"></div>
+    <div class="pit-tags">
+      <span class="tag" style="color:${C.cor};border-color:${C.cor}">${htm(C.nome)}</span>
+      <span style="margin-left:auto"></span>${fontePill(x.f)}
+      <span class="pill ${M.pill}">${htm(x.est)}</span>
+    </div>
+    <h4>${htm(x.d)}</h4>
+    <div class="pit-meta"><b>${htm(x.m)}</b><em>·</em>Resp. <b>${htm(x.r)}</b><em>·</em>${htm(M.disp)}${x.status==='aprovada'?'<em>·</em>'+avalCurta(x):''}</div>
+    <div class="pit-d ${desc?'':'pend'}">${desc?htm(desc):'Ficha ainda sem descrição — abra e complete para o pessoal saber quando usar.'}</div>
+    ${flag}
+    <div class="pit-ft">${acoes}<span class="pit-doc ${x.doc}" title="Documentação ${htm(x.docL)}"><i></i>${htm(x.docL)}</span></div>
+  </div>`;
+}
+function render(){
+  montarSeg(); montarChips();
+  const f=filtrados(), g=document.getElementById('grp').value, body=document.getElementById('body');
+  const tot=visiveis().length;
+  document.getElementById('cnt').innerHTML = `<b>${f.length}</b> de ${tot} ${VIEW==='disp'?'skills disponíveis':(VIEW==='pend'?'aguardando sua aprovação':'sugestões suas')}`;
+  pintarBtnFiltros();
+  if(VIEW!=='disp'){ renderFila(f); return; }
+  if(!f.length){
+    body.innerHTML = tot
+      ? `<div class="empty"><div class="empty-icon">🔍</div>Nenhuma skill atende aos filtros atuais.<br><b>Limpe os filtros</b> para ver todas.</div>`
+      : (VIEW==='pend'
+        ? `<div class="empty"><div class="empty-icon">${isAdmin()?'✅':'📝'}</div>${isAdmin()
+            ? 'Nenhuma sugestão na fila.<br><b>Tudo aprovado</b> — quando alguém cadastrar uma skill nova, ela aparece aqui.'
+            : 'Você ainda não sugeriu nenhuma skill.<br>Clique em <b>+ Adicionar skill</b> para colocar a sua no repositório.'}</div>`
+        : `<div class="empty"><div class="empty-icon">📭</div>Nenhuma skill publicada ainda.</div>`);
+    return;
+  }
+  if(!g){ body.innerHTML=`<div class="notes">${f.map(notaHTML).join('')}</div>`; return; }
+  const key=x=>g==='est'?x.est:(g==='c'?x.catL:x[g]);
+  let grupos=Array.from(new Set(f.map(key)));
+  if(g==='m') grupos=ORD_MET.filter(v=>grupos.includes(v)).concat(grupos.filter(v=>!ORD_MET.includes(v)));
+  else if(g==='est') grupos=ORD_EST.concat(['—']).filter(v=>grupos.includes(v));
+  else if(g==='c') grupos=catsTodas().map(c=>c.nome).filter(v=>grupos.includes(v));
+  else grupos.sort((a,b)=>f.filter(x=>key(x)===b).length-f.filter(x=>key(x)===a).length);
+  body.innerHTML = grupos.map((gr,i)=>{
+    const it=f.filter(x=>key(x)===gr);
+    const dl=it.filter(x=>x.est!=='WIP'&&x.est!=='—').length;
+    return `<div class="grp-hd ${i===0?'first':''}"><h3>${htm(gr)}</h3>
+      <span class="grp-n">${it.length} skill${it.length>1?'s':''}${VIEW==='disp'?` · ${dl} prontas para uso`:''}</span><i></i></div>
+      <div class="notes">${it.map(notaHTML).join('')}</div>`;
+  }).join('');
+}
+
+/* ── avaliações: 1 a 5 estrelas, média simples, uma nota por usuário ── */
+/* Cada skill guarda avaliacoes: [{email, nota, data}]. Avaliar de novo substitui a nota anterior. */
+const NOTA_LBL = {1:'Ruim',2:'Fraca',3:'Boa',4:'Muito boa',5:'Excelente'};
+const DEMO_AVALIACOES = true;   /* INTEGRAÇÃO: false — as avaliações reais vêm do backend */
+function mediaAval(x){
+  const a=x.avaliacoes||[], n=a.length;
+  return {n, media: n ? Math.round(a.reduce((t,v)=>t+v.nota,0)/n*10)/10 : null};
+}
+function fmtNota(v){ return v==null ? '' : v.toFixed(1).replace('.',','); }
+function avalTexto(x){ const {n,media}=mediaAval(x);
+  return n ? fmtNota(media)+' de 5 ('+n+' avaliaç'+(n>1?'ões':'ão')+')' : 'Sem avaliações'; }
+function avalCurta(x){ const {n,media}=mediaAval(x);
+  return n ? `<span class="rt" title="Média simples de ${n} avaliaç${n>1?'ões':'ão'}">★ ${fmtNota(media)} · ${n}</span>`
+           : `<span class="rt vazio" title="Ainda sem avaliações">☆ sem avaliações</span>`; }
+function minhaNota(x){ return (x.avaliacoes||[]).find(v=>v.email===USUARIO.email) || null; }
+function avaliar(id,nota){
+  const x=byId(id); if(!x || x.status!=='aprovada') return;
+  nota=Math.max(1,Math.min(5,Math.round(nota)));
+  /* INTEGRAÇÃO: gravar no backend — chave (skill, email do usuário); nova nota substitui a anterior */
+  const a=minhaNota(x);
+  if(a){ a.nota=nota; a.data=hoje(); } else x.avaliacoes.push({email:USUARIO.email, nota, data:hoje()});
+  render(); pintarAvaliacao(x);
+  toast((a?'Avaliação atualizada':'Obrigado pela avaliação')+': <b>'+nota+' estrela'+(nota>1?'s':'')+'</b> para <b>'+htm(x.d)+'</b>.','ok');
+}
+/* para quem clicou sem querer: apaga só a nota do próprio usuário */
+function removerAvaliacao(id){
+  const x=byId(id); if(!x) return;
+  const a=minhaNota(x); if(!a) return;
+  /* INTEGRAÇÃO: excluir no backend a nota da chave (skill, email do usuário) */
+  x.avaliacoes = x.avaliacoes.filter(v=>v!==a);
+  render(); pintarAvaliacao(x);
+  toast('Sua avaliação de <b>'+htm(x.d)+'</b> foi excluída.','warn');
+}
+/* bloco "Sua avaliação" + célula de média na ficha aberta */
+function pintarAvaliacao(x){
+  const el=document.getElementById('d-aval'), md=document.getElementById('d-aval-media');
+  if(!el || DET_ID!==x.id) return;
+  const {n,media}=mediaAval(x);
+  if(md) md.innerHTML = n
+    ? '<span class="rt">★ '+fmtNota(media)+'</span> <span style="font-weight:600;font-size:11.5px;color:var(--g-text3)">· '+n+' avaliaç'+(n>1?'ões':'ão')+'</span>'
+    : '<span style="font-weight:600;color:var(--g-text3)">Sem avaliações</span>';
+  if(x.status!=='aprovada'){
+    el.innerHTML='<div class="aval"><span class="aval-msg">A avaliação abre quando a skill for aprovada e publicada.</span></div>'; return; }
+  const minha=minhaNota(x), v=minha?minha.nota:0;
+  el.innerHTML = '<div class="aval"><div><div class="fld-l" style="margin-bottom:2px">Sua avaliação</div>'
+    + '<div class="stars" role="radiogroup" aria-label="Avaliar de 1 a 5 estrelas">'
+    + [1,2,3,4,5].map(k=>'<button type="button" class="'+(k<=v?'on':'')+'" role="radio" aria-checked="'+(k===v)+'" title="'+k+' — '+NOTA_LBL[k]
+        +'" onclick="avaliar('+x.id+','+k+')">★</button>').join('')
+    + '</div></div><span class="aval-msg">'
+    + (minha ? 'Você deu <b>'+v+' — '+NOTA_LBL[v]+'</b> em '+htm(minha.data)+'. Clique em outra estrela para mudar.'
+             : 'Clique em uma estrela para avaliar — a nota é salva na hora.')
+    + '</span>'
+    + (minha ? '<button type="button" class="btn-rm-aval" onclick="removerAvaliacao('+x.id+')" title="Apaga a sua nota desta skill">✕ Excluir minha avaliação</button>' : '')
+    + '</div>';
+}
+/* só para a demonstração: avaliações fictícias (emails @demo.local) para os cards não nascerem vazios */
+function semearAvaliacoesDemo(){
+  ITENS.filter(x=>x.status==='aprovada').forEach(x=>{
+    let h=7; for(const ch of x.slug) h=(h*31+ch.charCodeAt(0))>>>0;
+    const n=h%13, base=3+(h>>>4)%3;
+    for(let k=0;k<n;k++){
+      const nota=Math.max(1,Math.min(5, base - ((h>>>(k%16))&1) + (k%7===3?1:0)));
+      x.avaliacoes.push({email:'avaliador'+String(k+1).padStart(2,'0')+'@demo.local', nota, data:hoje(), demo:true});
+    }
+  });
+}
+
+/* ── ficha .md ───────────────────────────────────────────────────────── */
+function mdFor(x){
+  const M=EST_META[x.est], L=[];
+  const desc = x.esc || x.out || `${x.t==='Skill'?'Skill':'Ferramenta'} ${x.m} — ${x.d}`;
+  L.push('---');
+  L.push('name: '+x.slug);
+  L.push('description: "' + desc.replace(/\r?\n/g,' ').replace(/"/g,'').slice(0,280) + '"');
+  L.push('metadata:');
+  L.push('  origem: '+fonteDe(x.f).sigla+' ('+x.fonteL+')');   /* a chave fonte: já é usada para a base de origem da ficha */
+  L.push('  categoria: '+x.catL);
+  L.push('  metodologia: '+x.m);
+  L.push('  formato: '+x.t);
+  L.push('  amplitude: "'+x.ampL+'"');
+  L.push('  responsavel: '+x.r);
+  L.push('  estagio: '+x.est);
+  L.push('  disponibilidade: '+M.disp);
+  L.push('  impacto_horas: "'+x.hrL+'"');
+  L.push('  impacto_qualidade: "'+x.qL+'"');
+  L.push('  avaliacao: "'+avalTexto(x)+'"');
+  L.push('  documentacao: '+x.docL);
+  L.push('  publicacao: '+({aprovada:'Aprovada e publicada',pendente:'Aguardando aprovação',recusada:'Recusada'}[x.status]));
+  L.push('  versao: '+(x.versao?'v'+x.versao:'não publicada')+(x._proposta?' (proposta em análise, ainda não aprovada)':''));
+  const arqV = x._arquivo!==undefined ? x._arquivo : ((x.historico||[]).find(h=>h.versao===x.versao)||{}).arquivo;
+  L.push('  arquivo_versao: '+(arqV ? arqV.nome : (x.arquivoNovo ? x.arquivoNovo.nome+' (aguardando aprovação)' : 'não anexado')));
+  if(x.repo) L.push('  repositorio: "'+x.repo+'"');
+  L.push('  owner: '+x.r+(x.owner&&x.owner.email?' ('+loginDoEmail(x.owner.email)+')':''));
+  L.push('  cadastrado_por: '+pessoaTxt(x.criador)+' em '+((x.criador&&x.criador.data)||x.criado));
+  L.push('  ultima_modificacao: '+pessoaTxt(x.ultMod)+' em '+((x.ultMod&&x.ultMod.data)||x.criado));
+  L.push('  fonte: "'+FONTE_LABEL+'"');
+  L.push('---');
+  L.push('');
+  L.push('# '+x.d);
+  L.push('');
+  L.push('> **Estágio:** '+x.est+' — '+M.desc+'  ');
+  L.push('> **Disponibilidade:** '+M.disp+'  ');
+  L.push('> **Responsável:** '+x.r+' · **Fonte:** '+x.fonteL+' · **Categoria:** '+x.catL+' · **Metodologia:** '+x.m+' · **Formato:** '+x.t+' · **Amplitude:** '+x.ampL);
+  L.push('');
+  L.push('## O que ela entrega');
+  L.push(x.esc || NDOC);
+  L.push('');
+  L.push('## O que é necessário para rodar');
+  if(x.inp){ linhas(x.inp).forEach(b=>L.push('- '+b)); } else { L.push(NDOC); }
+  L.push('');
+  L.push('## O que sai no final');
+  if(x.out){ linhas(x.out).forEach(b=>L.push('- '+b)); } else { L.push(NDOC); }
+  L.push('');
+  L.push('## Como usar');
+  if(x.uso){ linhas(x.uso).forEach((b,i)=>L.push((i+1)+'. '+b.replace(/^\d+[\.\)]\s*/,''))); }
+  else { L.push(TIPO_DESC[x.t]||''); L.push(''); L.push(NDOC); }
+  L.push('');
+  L.push('## Exemplos de uso');
+  if(x.ex){ linhas(x.ex).forEach(b=>L.push('- '+b)); } else { L.push('_Nenhum projeto registrado ainda._'); }
+  L.push('');
+  L.push('## Backlog e melhorias previstas');
+  if(x.com){ linhas(x.com).forEach(b=>L.push('- [ ] '+b)); } else { L.push('_Sem itens registrados._'); }
+  L.push('');
+  if(x.link){ L.push('## Onde encontrar'); L.push(x.link); L.push(''); }
+  if(x.repo){ L.push('## Repositório de origem (internet)'); L.push(x.repo); L.push(''); }
+  L.push('## Impacto declarado');
+  L.push('| Dimensão | Nota |');
+  L.push('|---|---|');
+  L.push('| Economia de horas | '+x.hrL+' |');
+  L.push('| Ganho de qualidade | '+x.qL+' |');
+  L.push('| Avaliação dos usuários | '+avalTexto(x)+' |');
+  L.push('');
+  L.push('_Escala: 1 Baixo · 2 Médio · 3 Alto · 4 Muito alto._');
+  L.push('');
+  if(x.como && x.como!==x.est){
+    L.push('## Situação reportada');
+    L.push('A base de origem registra estágio **'+x.est+'** e situação **'+x.como+'**.');
+    L.push('');
+    L.push('> ⚠️ Divergência entre os dois campos — confirmar com o responsável qual vale.');
+    L.push('');
+  } else if(x.como){ L.push('## Situação reportada'); L.push('**'+x.como+'**'); L.push(''); }
+  if(x.obs){ L.push('## Observações'); L.push(x.obs); L.push(''); }
+  if(x.status==='recusada' && x.motivo){ L.push('## Motivo da recusa'); L.push(x.motivo); L.push(''); }
+  const hv=(x.historico||[]).filter(h=>!x.versao || h.versao<=x.versao);
+  if(hv.length){
+    L.push('## Histórico de versões');
+    hv.slice().reverse().forEach(h=>L.push('- **v'+h.versao+'** — '+h.data+' — '+pessoaTxt(h.autor)+(h.notas?' — '+h.notas:'')+(h.arquivo?' — arquivo: '+h.arquivo.nome:'')));
+    L.push('');
+  }
+  L.push('## Checklist de documentação');
+  const ck=(b,t)=>'- ['+(b?'x':' ')+'] '+t;
+  L.push(ck(x.esc,'Escopo descrito'));
+  L.push(ck(x.inp,'Inputs necessários listados'));
+  L.push(ck(x.out,'Output esperado descrito'));
+  L.push(ck(x.uso,'Passo a passo de uso'));
+  L.push(ck(x.ex,'Exemplos de projeto onde já rodou'));
+  L.push(ck(x.com,'Backlog de melhorias'));
+  L.push(ck(x.hr,'Impacto em horas avaliado'));
+  L.push(ck(x.q,'Impacto em qualidade avaliado'));
+  L.push(ck(x.amp,'Amplitude classificada'));
+  L.push(ck(x.link,'Local do arquivo informado'));
+  L.push('');
+  L.push('---');
+  L.push('Ficha gerada pelo '+FONTE_LABEL);
+  return L.join('\n');
+}
+function baixa(nome, conteudo, mime){
+  const blob=new Blob(['﻿'+conteudo],{type:(mime||'text/markdown')+';charset=utf-8;'});
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function baixarMd(id){
+  const x=byId(id); if(!x) return;
+  baixa('skill_'+x.slug+'.md', mdFor(x));
+  toast('Ficha <b>skill_'+htm(x.slug)+'.md</b> baixada.','ok');
+}
+function baixarPacote(){
+  const f=filtrados();
+  if(!f.length){ toast('Nenhuma skill nos filtros atuais.','err'); return; }
+  const L=['# Repositório de Skills — Gradus Consultoria','', 'Fonte: '+FONTE_LABEL,'',
+    'Pacote com **'+f.length+'** ficha(s), conforme os filtros aplicados.','','## Índice',''];
+  f.forEach(x=>L.push('- **'+x.d+'** — '+x.catL+' · '+x.m+' · '+x.est+' · resp. '+x.r+' (`skill_'+x.slug+'.md`)'));
+  L.push('');
+  f.forEach(x=>{ L.push('\n\n<!-- ═══════════════════════════════════ -->\n'); L.push(mdFor(x)); });
+  baixa('repositorio_skills_'+f.length+'-fichas.md', L.join('\n'));
+  toast('Pacote com <b>'+f.length+'</b> ficha(s) baixado.','ok');
+}
+
+/* ── versões: histórico, proposta de nova versão e aprovação ─────────────
+   Fluxo: alguém propõe a v(n+1) de uma skill publicada -> o owner aprova (e o admin também, se a skill
+   for ORG: aprovação dupla, em qualquer ordem) -> a proposta vira a versão atual e o autor vira owner.
+   Admin publica direto. Owner propondo na própria skill publica direto (se ORG, falta só o admin).
+   Só uma proposta em análise por skill; até a aprovação, a versão atual continua valendo. */
+const DEMO_VERSOES = MODO_DEMO;   /* INTEGRAÇÃO: histórico e propostas reais vêm do backend */
+const LBL_CAMPO = {d:'Nome',c:'Categoria',f:'Fonte',m:'Metodologia',t:'Formato',e:'Estágio',amp:'Amplitude',hr:'Impacto em horas',
+  q:'Impacto em qualidade',esc:'O que ela entrega',inp:'O que é necessário para rodar',out:'O que sai no final',uso:'Como usar',
+  ex:'Exemplos de uso',com:'Backlog e melhorias',link:'Onde encontrar',repo:'Link do repositório',obs:'Observações'};
+function valCampo(k,v){
+  if(k==='c') return catDe(v).nome;
+  if(k==='f') return fonteDe(v).sigla+' — '+fonteDe(v).nome;
+  if(k==='amp') return AMP_LBL[v]||'Não informada';
+  if(k==='hr'||k==='q') return IMP_LBL[v]||'Não avaliado';
+  return txt(v)||'—';
+}
+/* ── arquivo da versão ──
+   Toda nova versão leva o arquivo da skill. No protótipo ele fica só na memória desta sessão.
+   INTEGRAÇÃO: enviar ao armazenamento (SharePoint / blob storage) e guardar a referência (url/id)
+   em proposta.arquivo e em historico[].arquivo, no lugar do blob. */
+const ARQ_MAX_MB = 20;
+let ARQ_SEL = null;   /* arquivo escolhido no formulário de nova versão */
+function fmtBytes(n){ return n<1024 ? n+' B' : n<1048576 ? Math.round(n/1024)+' KB' : (n/1048576).toFixed(1).replace('.',',')+' MB'; }
+function escolherArquivo(f){
+  if(!f) return;
+  if(f.size>ARQ_MAX_MB*1048576){ toast('O arquivo passa de '+ARQ_MAX_MB+' MB.','err'); return; }
+  ARQ_SEL={nome:f.name, tamanho:f.size, tipo:f.type||'', data:hoje(), blob:f};
+  pintarArquivoSel();
+}
+function soltarArquivo(e){ e.preventDefault(); e.currentTarget.classList.remove('over'); escolherArquivo(e.dataTransfer.files[0]); }
+function pintarArquivoSel(){
+  document.getElementById('drop-arq').classList.remove('bad');
+  document.getElementById('drop-txt').innerHTML = ARQ_SEL
+    ? '<b>'+htm(ARQ_SEL.nome)+'</b> · '+fmtBytes(ARQ_SEL.tamanho)+'<div class="hint" style="margin:0">Clique para trocar o arquivo</div>'
+    : '<b>Clique para escolher</b> ou arraste o arquivo aqui';
+  document.getElementById('i-arq').value='';
+}
+function baixarArquivo(a){
+  if(!a || !a.blob){ toast('Arquivo indisponível nesta sessão.','err'); return; }
+  const url=URL.createObjectURL(a.blob), el=document.createElement('a');
+  el.href=url; el.download=a.nome; document.body.appendChild(el); el.click(); el.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function baixarArqVersao(id,v){ const x=byId(id), h=x && (x.historico||[]).find(e=>e.versao===v); baixarArquivo(h && h.arquivo); }
+function baixarArqNovo(id){ const x=byId(id); baixarArquivo(x && x.arquivoNovo); }
+function linkSeguro(u){ return /^https?:\/\//i.test(u) ? '<a href="'+htm(u)+'" target="_blank" rel="noopener noreferrer">'+htm(u)+'</a>' : htm(u); }
+function baixarArqProposta(id){ const x=byId(id); baixarArquivo(x && x.proposta && x.proposta.arquivo); }
+function arqChip(a, onclick){
+  return a ? '<button type="button" class="arq" onclick="'+onclick+'" title="Baixar o arquivo">📎 '+htm(a.nome)+' <span class="hsub">'+fmtBytes(a.tamanho)+'</span></button>'
+           : '<span class="hsub">sem arquivo</span>';
+}
+function arqDemo(nome, texto){   /* só para a demonstração */
+  const b=new Blob([texto],{type:'text/plain'});
+  return {nome, tamanho:b.size, tipo:'text/plain', data:hoje(), blob:b, demo:true};
+}
+
+function aprovacoesNecessarias(x,u){
+  if(u.papel==='admin') return [];                              /* admin publica direto */
+  const req=[];
+  if(!x.owner.email) req.push('admin');                         /* owner sem email vinculado: o admin aprova no lugar */
+  else if(x.owner.email!==u.email) req.push('owner');
+  if(x.f==='org' && !req.includes('admin')) req.push('admin');  /* skill ORG: aprovação dupla */
+  return req;
+}
+function papeisQuePosso(x){
+  const p=x.proposta; if(!p || p.status!=='pendente') return [];
+  const r=[];
+  if(p.exige.includes('owner') && !p.aprov.owner && x.owner.email && x.owner.email===USUARIO.email) r.push('owner');
+  if(p.exige.includes('admin') && !p.aprov.admin && isAdmin()) r.push('admin');
+  return r;
+}
+function verProposta(x){
+  const p=x.proposta; if(!p) return false;
+  return papeisQuePosso(x).length>0 || p.autor.email===USUARIO.email || isAdmin() || (!!x.owner.email && x.owner.email===USUARIO.email);
+}
+function nomeAprov(x,k){ return k==='owner' ? 'Owner '+x.r : 'Admin'; }
+function statusAprovHTML(x){
+  const p=x.proposta;
+  return p.exige.map(k=>{ const ok=p.aprov[k];
+    return '<span class="apv '+(ok?'ok':'')+'" title="'+(ok?'Aprovado por '+htm(pessoaTxt(ok))+' em '+htm(ok.data):'Aguardando')+'">'
+      +(ok?'✓ ':'⏳ ')+htm(nomeAprov(x,k))+'</span>'; }).join(' ');
+}
+
+function abrirNovaVersao(id){
+  const x=byId(id); if(!x || x.status!=='aprovada') return;
+  const p=x.proposta;
+  if(p && p.status==='pendente'){ toast('Já existe uma proposta de v'+(x.versao+1)+' em análise para esta skill.','warn'); return; }
+  const rascunho = p && p.status==='recusada' && p.autor.email===USUARIO.email;   /* corrigir e reenviar */
+  VER_ID=id; EDIT_ID=null;
+  selOpts('i-t',OPC_TIPO); selOpts('i-m',ORD_MET); selCats(); selFontes(x.f);
+  const base = rascunho ? Object.assign({}, x, p.dados) : x;
+  CAMPOS.forEach(([cid,k])=>{ const el=document.getElementById(cid); el.classList.remove('bad','imp');
+    el.value = (base[k]===null||base[k]===undefined)?'':base[k]; });
+  document.getElementById('i-r').value = x.r;
+  document.getElementById('f-ver').style.display='block';
+  const nt=document.getElementById('i-notas'); nt.classList.remove('bad'); nt.value = rascunho ? p.notas : '';
+  ARQ_SEL = rascunho ? (p.arquivo||null) : null; pintarArquivoSel();
+  FORM_MODO='versao'; pintarBlocoArquivo(); limparImportacao();
+  const req=aprovacoesNecessarias(x, USUARIO), prox=x.versao+1;
+  document.getElementById('f-t').textContent='Nova versão — '+x.d;
+  document.getElementById('f-s').innerHTML='Versão atual <b>v'+x.versao+'</b> · a sua será a <b>v'+prox+'</b>';
+  document.getElementById('f-note').className='fnote'+(req.length?' warn':'');
+  document.getElementById('f-note').innerHTML = (req.length
+      ? '<strong>Precisa de aprovação:</strong> '+req.map(k=>k==='owner'?'do owner <b>'+htm(x.r)+'</b>':'do <b>admin</b> (Gestão Metodológica)').join(' e ')
+        +'. Enquanto isso, a v'+x.versao+' continua valendo para todos. Quando aprovada, você passa a ser o owner (Resp.) da skill.'
+      : '<strong>'+(isAdmin()?'Você é admin':'Você é o owner')+':</strong> a v'+prox+' é publicada assim que você enviar.')
+    + (rascunho && p.motivo ? '<br><strong>Motivo da recusa anterior:</strong> '+htm(p.motivo) : '');
+  document.getElementById('f-err').className='ferr';
+  document.getElementById('f-f').innerHTML =
+    '<button class="btn-p" onclick="enviarVersao()">⬆ '+(req.length?'Enviar v'+prox+' para aprovação':'Publicar v'+prox)+'</button>'
+    + '<button class="btn-s" onclick="fechar(\'m-form\')">Cancelar</button>'
+    + '<span class="sp">skill_'+htm(x.slug)+'.md</span>';
+  document.getElementById('m-det').classList.remove('show');
+  document.getElementById('m-form').classList.add('show');
+  setTimeout(()=>nt.focus(),80);
+}
+function enviarVersao(){
+  const x=byId(VER_ID); if(!x) return;
+  if(!validarForm([['i-notas','O que mudou nesta versão']], true)) return;
+  const dados=lerForm();
+  /* INTEGRAÇÃO: repetir no backend — só admin define ou retira ORG */
+  if(!isAdmin()){ if(x.f==='org') dados.f='org'; else if(dados.f==='org') dados.f=x.f; }
+  const req=aprovacoesNecessarias(x, USUARIO), prox=x.versao+1;
+  x.proposta={autor:pessoaAtual(), data:hoje(), notas:document.getElementById('i-notas').value.trim(), dados, arquivo:ARQ_SEL,
+              base:x.versao, exige:req, aprov:{}, status:'pendente', motivo:''};
+  fechar('m-form');
+  if(!req.length){ publicarVersao(x); VIEW='disp'; montarChips(); render();
+    toast('<b>'+htm(x.d)+'</b> atualizada para <b>v'+prox+'</b>.','ok'); return; }
+  /* INTEGRAÇÃO: notificar os aprovadores (owner e/ou admin) */
+  VIEW='minhas'; render();
+  toast('Proposta de <b>v'+prox+'</b> de <b>'+htm(x.d)+'</b> enviada para aprovação '
+    + req.map(k=>k==='owner'?'do owner '+htm(x.r):'do admin').join(' e ')+'.','ok');
+}
+function aprovarVersao(id){
+  const x=byId(id); if(!x || !x.proposta) return;
+  const papeis=papeisQuePosso(x); if(!papeis.length) return;
+  const p=x.proposta, prox=x.versao+1;
+  /* INTEGRAÇÃO: registrar a aprovação no backend (quem, em que papel, quando) */
+  papeis.forEach(k=>{ p.aprov[k]=Object.assign(pessoaAtual(),{data:hoje()}); });
+  const falta=p.exige.filter(k=>!p.aprov[k]);
+  fechar('m-det');
+  if(!falta.length){ publicarVersao(x); montarChips(); render();
+    toast('<b>'+htm(x.d)+'</b> atualizada para <b>v'+prox+'</b>. <b>'+htm(pessoaTxt(x.owner))+'</b> passa a ser o owner.','ok'); }
+  else { render(); toast('Sua aprovação foi registrada. Falta a aprovação do <b>'+htm(nomeAprov(x,falta[0]))+'</b>.','ok'); }
+}
+function publicarVersao(x){
+  const p=x.proposta;
+  const atual=(x.historico||[]).find(h=>h.versao===x.versao);
+  if(atual) atual.snapshot=snapshotDe(x);   /* guarda como a versão terminou (inclui ajustes do admin) */
+  Object.assign(x, p.dados);
+  x.versao=(x.versao||0)+1;
+  x.owner={email:p.autor.email, iniciais:p.autor.iniciais};   /* quem subiu a versão vira o owner */
+  x.ultMod=Object.assign({}, p.autor, {data:hoje()});
+  derivar(x);
+  x.historico.push({versao:x.versao, data:hoje(), autor:Object.assign({},p.autor), notas:p.notas, arquivo:p.arquivo||null, snapshot:snapshotDe(x),
+                    aprovacoes:Object.assign({},p.aprov)});
+  x.proposta=null;
+  return x.versao;
+}
+function mostrarRejVersao(id){
+  const el=document.getElementById('d-prev');
+  el.innerHTML='<div class="rej"><div class="fld-l" style="margin-bottom:5px">Motivo da recusa (quem enviou vê este texto)</div>'
+    + '<textarea id="rej-t" placeholder="Ex: o passo a passo não bate com a versão atual da skill."></textarea>'
+    + '<div class="rej-a"><button class="btn-p" style="background:#800000" onclick="recusarVersao('+id+')">Confirmar recusa</button>'
+    + '<button class="btn-s" onclick="document.getElementById(\'d-prev\').innerHTML=\'\'">Cancelar</button></div></div>';
+  el.scrollIntoView({block:'nearest'}); document.getElementById('rej-t').focus();
+}
+function recusarVersao(id){
+  const x=byId(id); if(!x || !x.proposta) return;
+  const mot=(document.getElementById('rej-t').value||'').trim();
+  if(!mot){ toast('Escreva o motivo para quem enviou saber o que corrigir.','err'); return; }
+  const papel=papeisQuePosso(x)[0]||'', p=x.proposta;
+  /* INTEGRAÇÃO: registrar a recusa no backend e avisar quem enviou */
+  p.status='recusada'; p.motivo=mot; p.recusadoPor=Object.assign(pessoaAtual(),{data:hoje(), papel});
+  fechar('m-det'); render();
+  toast('Proposta de v'+(x.versao+1)+' de <b>'+htm(x.d)+'</b> recusada. O motivo ficou registrado para quem enviou.','warn');
+}
+function descartarProposta(id){
+  const x=byId(id); if(!x || !x.proposta || x.proposta.autor.email!==USUARIO.email) return;
+  const v=x.versao+1; x.proposta=null; fechar('m-det'); render();
+  toast('Proposta de v'+v+' de <b>'+htm(x.d)+'</b> descartada.','warn');
+}
+function baixarVersao(id,v){
+  const x=byId(id); if(!x) return;
+  if(v===x.versao) return baixarMd(id);
+  const h=(x.historico||[]).find(e=>e.versao===v); if(!h) return;
+  const tmp=derivar(Object.assign({}, x, h.snapshot, {versao:h.versao, owner:Object.assign({},h.autor),
+                                  ultMod:Object.assign({},h.autor,{data:h.data}), proposta:null}));
+  baixa('skill_'+tmp.slug+'_v'+v+'.md', mdFor(tmp));
+  toast('Ficha da <b>v'+v+'</b> de <b>'+htm(x.d)+'</b> baixada.','ok');
+}
+function baixarProposta(id){
+  const x=byId(id); if(!x || !x.proposta) return;
+  const tmp=derivar(Object.assign({}, x, x.proposta.dados, {versao:x.versao+1, _proposta:true, _arquivo:x.proposta.arquivo||null, proposta:null}));
+  baixa('skill_'+tmp.slug+'_v'+tmp.versao+'_proposta.md', mdFor(tmp));
+  toast('Ficha da proposta <b>v'+tmp.versao+'</b> baixada.','ok');
+}
+
+/* cards das filas (Pendentes de aprovação / Minhas sugestões) */
+function renderFila(f){
+  const body=document.getElementById('body'), q=fila();
+  const novas=q.novas.filter(x=>f.includes(x)), versoes=q.versoes.filter(x=>f.includes(x));
+  if(!novas.length && !versoes.length){
+    body.innerHTML = (q.novas.length+q.versoes.length)
+      ? `<div class="empty"><div class="empty-icon">🔍</div>Nada atende aos filtros atuais.<br><b>Limpe os filtros</b> para ver tudo.</div>`
+      : (VIEW==='pend'
+        ? `<div class="empty"><div class="empty-icon">✅</div>Nada aguardando a sua aprovação.<br>Quando alguém propuser uma versão de uma skill sua${isAdmin()?' (ou de uma skill ORG)':''}, ela aparece aqui.</div>`
+        : `<div class="empty"><div class="empty-icon">📝</div>Você ainda não propôs nenhuma versão.<br>Use <b>⬆ Subir nova versão</b> na ficha de uma skill para propor melhorias.</div>`);
+    return;
+  }
+  const sec=(tit,n,html,first)=>`<div class="grp-hd ${first?'first':''}"><h3>${tit}</h3><span class="grp-n">${n}</span><i></i></div><div class="notes">${html}</div>`;
+  let out='';
+  if(versoes.length) out+=sec('Novas versões', versoes.length+' proposta'+(versoes.length>1?'s':''), versoes.map(propostaCardHTML).join(''), true);
+  if(novas.length)   out+=sec('Novas skills', novas.length+' skill'+(novas.length>1?'s':''), novas.map(notaHTML).join(''), !versoes.length);
+  body.innerHTML=out;
+}
+function propostaCardHTML(x){
+  const p=x.proposta, C=catDe(x.c), prox=x.versao+1, posso=papeisQuePosso(x).length>0, meu=p.autor.email===USUARIO.email;
+  let acoes;
+  if(posso) acoes=`<button class="btn-gh ok" onclick="aprovarVersao(${x.id})">✓ Aprovar</button>
+                   <button class="btn-gh no" onclick="abrirDet(${x.id},'proposta')">Revisar</button>`;
+  else if(meu && p.status==='recusada') acoes=`<button class="btn-gh" onclick="abrirNovaVersao(${x.id})">Corrigir e reenviar</button>
+                   <button class="btn-gh no" onclick="descartarProposta(${x.id})">Descartar</button>`;
+  else acoes=`<button class="btn-gh" onclick="abrirDet(${x.id},'proposta')">Ver proposta</button>`;
+  const flag = p.status==='recusada'
+    ? `<div class="pit-flag" style="border-color:rgba(128,0,0,.28)">✕ <b style="color:#800000">Recusada</b> por ${htm(pessoaTxt(p.recusadoPor))}${p.motivo?' — '+htm(p.motivo):''}</div>`
+    : `<div class="pit-flag">⏳ <b>Aguardando</b> ${statusAprovHTML(x)}${p.demo?' · <b>exemplo de demonstração</b>':''}</div>`;
+  return `<div class="pit" style="background:${C.bg}">
+    <div class="fold"></div>
+    <div class="pit-acc" style="background:${C.cor}"></div>
+    <div class="pit-tags">
+      <span class="tag" style="color:${C.cor};border-color:${C.cor}">${htm(C.nome)}</span>
+      <span style="margin-left:auto"></span>${fontePill(x.f)}
+      <span class="pill pb">v${x.versao} → v${prox}</span>
+    </div>
+    <h4>${htm(x.d)}</h4>
+    <div class="pit-meta"><b>${htm(x.m)}</b><em>·</em>Resp. <b>${htm(x.r)}</b><em>·</em>Proposta por <b>${htm(pessoaTxt(p.autor))}</b> em ${htm(p.data)}</div>
+    <div class="pit-d">${htm(p.notas)}</div>
+    ${p.arquivo?'<div style="margin-top:8px">'+arqChip(p.arquivo,'baixarArqProposta('+x.id+')')+'</div>':''}
+    ${flag}
+    <div class="pit-ft">${acoes}</div>
+  </div>`;
+}
+
+/* só para a demonstração: histórico e propostas de versão para ver o fluxo nos perfis GH, LP e admin */
+function semearVersoesDemo(){
+  const [, cons, gh] = USUARIOS_DEMO;
+  const pessoa=u=>({email:u.email, iniciais:iniciaisDe(u.email)});
+  const consU={email:cons.email, papel:'consulta'};
+  const ppt=ITENS.find(x=>x.d==='PPT Reviewer');
+  if(ppt && ppt.owner.email){
+    const v1=snapshotDe(ppt); v1.esc='Avalia apresentações quanto ao padrão visual da Gradus'; v1.q=3;
+    ppt.historico=[
+      {versao:1, data:'29/05/2026', autor:pessoa(gh), notas:'Versão inicial (lista corrida GRA500)', snapshot:v1},
+      {versao:2, data:'15/09/2026', autor:pessoa(gh), notas:'Passa a revisar forma e conteúdo e a conduzir a correção por blocos', snapshot:snapshotDe(ppt),
+       arquivo:arqDemo('gradus-pptx-reviewer_v2_DEMO.txt','Arquivo de demonstração — v2 do PPT Reviewer.')}];
+    ppt.versao=2; ppt.ultMod=Object.assign(pessoa(gh),{data:'15/09/2026'});
+    const d=snapshotDe(ppt);
+    d.uso='Invoque /gradus-pptx-reviewer no Claude\nSuba o .pptx\nRevise o .xlsx de controle\nAplique as correções por bloco';
+    d.com='Checar a numeração dos slides contra o índice';
+    ppt.proposta={autor:pessoa(cons), data:hoje(), notas:'Incluí o passo a passo de uso e um item de backlog para checar a numeração dos slides.',
+                  dados:d, arquivo:arqDemo('gradus-pptx-reviewer_v3_DEMO.txt','Arquivo de demonstração — proposta de v3 do PPT Reviewer.'), base:2, exige:aprovacoesNecessarias(ppt,consU), aprov:{}, status:'pendente', motivo:'', demo:true};
+  }
+  const alu=ITENS.find(x=>x.d==='Pacote de Aluguéis');
+  if(alu && alu.owner.email){
+    const d=snapshotDe(alu);
+    d.inp='Base de custos por imóvel em .xlsx: imóvel, m², aluguel mensal, IPTU e vigência do contrato'; d.e='MVP2';
+    alu.proposta={autor:pessoa(cons), data:hoje(), notas:'Documentei os inputs e passei para MVP2 depois do uso em projeto.',
+                  dados:d, arquivo:arqDemo('pacote-alugueis_v2_DEMO.txt','Arquivo de demonstração — proposta de v2 do Pacote de Aluguéis.'), base:alu.versao, exige:aprovacoesNecessarias(alu,consU), aprov:{}, status:'pendente', motivo:'', demo:true};
+  }
+}
+
+/* ── detalhe ─────────────────────────────────────────────────────────── */
+function fld(l,v,pend){ return '<div class="fld"><div class="fld-l">'+htm(l)+'</div><div class="fld-v '+(v?'':'pend')+'">'+(v||htm(pend||'Não documentado — a preencher pelo responsável.'))+'</div></div>'; }
+function fldLista(l,s,pend,num){
+  const b=linhas(s);
+  return '<div class="fld"><div class="fld-l">'+htm(l)+'</div><div class="fld-v '+(b.length?'':'pend')+'">'
+    + (b.length ? '<'+(num?'ol':'ul')+'>'+b.map(x=>'<li>'+htm(x.replace(/^\d+[\.\)]\s*/,''))+'</li>').join('')+'</'+(num?'ol':'ul')+'>' : htm(pend)) + '</div></div>';
+}
+function abrirDet(id, aba){
+  const x=byId(id); if(!x) return;
+  DET_ID=id; DET_ABA=aba||'ficha';
+  const C=catDe(x.c);
+  document.getElementById('d-t').textContent=x.d;
+  document.getElementById('d-s').innerHTML =
+    '<span>'+htm(C.nome)+'</span><span>·</span><span>'+htm(x.m)+'</span><span>·</span><span>Resp. '+htm(x.r)+'</span>'
+    + '<span>·</span><span>'+htm(x.ampL)+'</span>'
+    + (x.versao ? '<span class="pill pb" title="Versão atual">v'+x.versao+'</span>' : '')
+    + (x.status!=='aprovada' ? '<span class="pill '+(x.status==='pendente'?'pa':'pc')+'">'+(x.status==='pendente'?'AGUARDANDO APROVAÇÃO':'RECUSADA')+'</span>' : '');
+  pintarDet();
+  document.getElementById('m-det').classList.add('show');
+}
+/* abas da ficha: Ficha | Histórico | Proposta (quando há proposta que a pessoa pode ver) */
+function pintarDet(){
+  const x=byId(DET_ID); if(!x) return;
+  if(DET_ABA==='proposta' && !verProposta(x)) DET_ABA='ficha';
+  const nH=(x.historico||[]).length, p=x.proposta;
+  const abas=[['ficha','Ficha',''],['hist','Histórico',nH?'<span class="n">'+nH+'</span>':'']];
+  if(verProposta(x)) abas.push(['proposta', p.status==='recusada'?'Proposta recusada':'Proposta v'+(x.versao+1),
+                                papeisQuePosso(x).length?'<span class="n hot">aprovar</span>':'']);
+  document.getElementById('d-tabs').innerHTML = abas.map(([k,l,n])=>
+    '<button type="button" class="'+(DET_ABA===k?'on':'')+'" onclick="abaDet(\''+k+'\')">'+l+n+'</button>').join('');
+  const b=document.getElementById('d-b'), f=document.getElementById('d-f');
+  if(DET_ABA==='hist'){ b.innerHTML=histHTML(x); f.innerHTML=histFooter(x); }
+  else if(DET_ABA==='proposta'){ b.innerHTML=propTabHTML(x); f.innerHTML=propFooter(x); }
+  else { b.innerHTML=fichaHTML(x); f.innerHTML=fichaFooter(x); pintarAvaliacao(x); }
+  b.scrollTop=0;
+}
+function abaDet(k){ DET_ABA=k; pintarDet(); }
+function mg(l,v){ return '<div class="mg-i"><div class="fld-l">'+htm(l)+'</div><div class="fld-v">'+v+'</div></div>'; }
+
+function fichaHTML(x){
+  const M=EST_META[x.est], C=catDe(x.c), p=x.proposta;
+  let extra='';
+  if(x.status==='recusada'&&x.motivo) extra += fld('Motivo da recusa','<b style="color:#800000">'+htm(x.motivo)+'</b>');
+  if(x.como&&x.como!==x.est) extra += fld('Situação reportada na base de origem','<b>'+htm(x.como)+'</b> <span class="pill pc" style="margin-left:6px">divergente do estágio '+htm(x.est)+'</span>');
+  const aviso = (p && p.status==='pendente')
+    ? '<div class="fnote" style="margin-bottom:16px">⏳ <b>v'+(x.versao+1)+' em análise</b> — proposta por <b>'+htm(pessoaTxt(p.autor))+'</b> em '+htm(p.data)
+      + '. Aguardando: '+statusAprovHTML(x)+'. Até a aprovação, continua valendo a v'+x.versao+'.'
+      + (verProposta(x) ? ' <a href="#" onclick="abaDet(\'proposta\');return false">Ver proposta</a>' : '') + '</div>'
+    : '';
+  const cr=x.criador||{}, um=x.ultMod||cr;
+  return aviso
+    + '<div class="mgrid">'
+    + '<div class="mg-i"><div class="fld-l">Categoria</div><div class="fld-v"><span class="tag" style="color:'+C.cor+';border-color:'+C.cor+';background:'+C.bg+'">'+htm(C.nome)+'</span></div></div>'
+    + '<div class="mg-i"><div class="fld-l">Fonte</div><div class="fld-v">'+fontePill(x.f)+' <span style="font-weight:600;font-size:12px">'+htm(x.fonteL)+'</span></div></div>'
+    + '<div class="mg-i"><div class="fld-l">Formato</div><div class="fld-v" title="'+htm(TIPO_DESC[x.t]||'')+'">'+htm(x.t)+'</div></div>'
+    + '<div class="mg-i"><div class="fld-l">Estágio</div><div class="fld-v"><span class="pill '+M.pill+'">'+htm(x.est)+'</span></div></div>'
+    + '<div class="mg-i"><div class="fld-l">Disponibilidade</div><div class="fld-v">'+htm(M.disp)+'</div></div>'
+    + '<div class="mg-i"><div class="fld-l">Impacto · horas</div><div class="fld-v">'+htm(x.hrL)+'</div></div>'
+    + '<div class="mg-i"><div class="fld-l">Impacto · qualidade</div><div class="fld-v">'+htm(x.qL)+'</div></div>'
+    + '<div class="mg-i"><div class="fld-l">Documentação</div><div class="fld-v">'+htm(x.docL)+'</div></div>'
+    + '<div class="mg-i"><div class="fld-l">Avaliação</div><div class="fld-v" id="d-aval-media"></div></div>'
+    + '</div>'
+    + '<div id="d-aval"></div>'
+    + fld('O que ela entrega', htm(x.esc))
+    + fldLista('O que é necessário para rodar', x.inp, 'Inputs não documentados.')
+    + fldLista('O que sai no final', x.out, 'Output não documentado.')
+    + fldLista('Como usar', x.uso, (TIPO_DESC[x.t]||'')+' Passo a passo ainda não documentado.', true)
+    + fldLista('Exemplos de uso', x.ex, 'Nenhum projeto registrado ainda.')
+    + fldLista('Backlog e melhorias previstas', x.com, 'Sem itens registrados.')
+    + (x.versao ? (()=>{ const hA=(x.historico||[]).find(h=>h.versao===x.versao);
+        return '<div class="fld"><div class="fld-l">Arquivo da versão atual (v'+x.versao+')</div><div class="fld-v">'
+          + (hA && hA.arquivo ? arqChip(hA.arquivo,'baixarArqVersao('+x.id+','+x.versao+')')
+                              : '<span class="hsub">Nenhum arquivo anexado nesta versão.</span>') + '</div></div>'; })()
+      : (x.arquivoNovo ? '<div class="fld"><div class="fld-l">Arquivo enviado (aguardando aprovação)</div><div class="fld-v">'
+          + arqChip(x.arquivoNovo,'baixarArqNovo('+x.id+')') + '</div></div>' : ''))
+    + (x.repo ? fld('Repositório de origem (internet)', linkSeguro(x.repo)) : '')
+    + (x.link?fld('Onde encontrar', htm(x.link)):'')
+    + (x.obs?fld('Observações', htm(x.obs)):'')
+    + extra
+    + '<div class="fld cred">Cadastrada por <b>'+htm(pessoaTxt(cr))+'</b> em '+htm(cr.data||x.criado)
+    + (x.origem==='base'?' · veio da lista corrida GRA500':'')
+    + '<br>Última modificação por <b>'+htm(pessoaTxt(um))+'</b> em '+htm(um.data||x.criado)+'</div>'
+    + '<div id="d-prev"></div>';
+}
+function fichaFooter(x){
+  const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
+  const emAnalise = !!(x.proposta && x.proposta.status==='pendente');
+  let ft = '<button class="btn-p" onclick="baixarMd('+x.id+')">⬇ Baixar ficha .md</button>'
+         + '<button class="btn-s" onclick="prevMd('+x.id+')" id="btn-prev">Ver conteúdo do .md</button>'
+         + (x.status==='aprovada' && !emAnalise ? '<button class="btn-s" onclick="abrirNovaVersao('+x.id+')">⬆ Subir nova versão</button>' : '')
+         + (podeEditar?'<button class="btn-s" onclick="editar('+x.id+')">Editar ficha</button>':'');
+  ft += '<span class="sp">skill_'+htm(x.slug)+'.md'+(x.versao?' · v'+x.versao:'')+'</span>';
+  return ft;
+}
+function histHTML(x){
+  const hs=(x.historico||[]).slice().sort((a,b)=>b.versao-a.versao);
+  if(!hs.length) return '<div class="empty" style="padding:40px 10px"><div class="empty-icon">🕘</div>Ainda sem versões publicadas.<br>'
+    + 'O histórico começa na <b>v1</b>, quando a skill for aprovada.</div>';
+  return '<div class="fld-v" style="font-size:12px;margin-bottom:12px;color:var(--g-text2)">Cada versão aprovada fica registrada aqui. '
+    + 'Baixar uma versão gera a ficha .md como ela estava naquela versão.</div>'
+    + '<div style="overflow-x:auto"><table class="htab"><thead><tr><th>Versão</th><th>Responsável</th><th>Data de upload</th><th>O que mudou</th><th>Arquivo</th><th>Ficha</th></tr></thead><tbody>'
+    + hs.map(h=>{
+        const a=h.autor||{}, ini=a.email?iniciaisDe(a.email,a.iniciais):(a.iniciais||'—');
+        return '<tr class="'+(h.versao===x.versao?'atual':'')+'">'
+          + '<td class="vv">v'+h.versao+(h.versao===x.versao?' <span class="pill pok" style="margin-left:4px">atual</span>':'')+'</td>'
+          + '<td><b>'+htm(ini)+'</b><div class="hsub">'+htm(a.email?loginDoEmail(a.email):'sem email vinculado')+'</div></td>'
+          + '<td style="white-space:nowrap">'+htm(h.data)+'</td>'
+          + '<td>'+htm(h.notas||'—')+'</td>'
+          + '<td>'+(h.arquivo || !(h.snapshot&&h.snapshot.repo) ? arqChip(h.arquivo,'baixarArqVersao('+x.id+','+h.versao+')')
+                  : '<a href="'+htm(h.snapshot.repo)+'" target="_blank" rel="noopener noreferrer" class="arq">🔗 repositório</a>')+'</td>'
+          + '<td><button class="btn-gh" onclick="baixarVersao('+x.id+','+h.versao+')" title="Baixar a ficha da v'+h.versao+'">⬇ .md</button></td></tr>';
+      }).join('')
+    + '</tbody></table></div>';
+}
+function histFooter(x){
+  const n=(x.historico||[]).length;
+  return '<button class="btn-p" onclick="baixarMd('+x.id+')">⬇ Baixar versão atual'+(x.versao?' (v'+x.versao+')':'')+'</button>'
+    + '<span class="sp">'+n+' vers'+(n===1?'ão':'ões')+'</span>';
+}
+function propTabHTML(x){
+  const p=x.proposta, prox=x.versao+1, a=p.autor;
+  const vazio=v=>(v===null||v===undefined)?'':String(v);
+  const dif=CAMPOS_VERSAO.filter(k=>vazio(p.dados[k])!==vazio(x[k]));
+  let h='<div class="mgrid">'
+    + mg('Proposta por', '<b>'+htm(iniciaisDe(a.email,a.iniciais))+'</b> <span class="hsub">'+htm(pessoaTxt(a))+'</span>')
+    + mg('Enviada em', htm(p.data))
+    + mg('Versão', 'v'+x.versao+' → <b>v'+prox+'</b>')
+    + mg('Aprovações', statusAprovHTML(x))
+    + mg('Arquivo da versão', arqChip(p.arquivo,'baixarArqProposta('+x.id+')')
+         + (p.dados.repo ? '<div style="margin-top:4px">'+linkSeguro(p.dados.repo)+'</div>' : ''))
+    + '</div>';
+  if(p.status==='recusada')
+    h += fld('Recusada por '+pessoaTxt(p.recusadoPor)+(p.recusadoPor&&p.recusadoPor.data?' em '+p.recusadoPor.data:''),
+             '<b style="color:#800000">'+htm(p.motivo)+'</b>');
+  h += fld('O que mudou nesta versão', htm(p.notas));
+  h += '<div class="fld"><div class="fld-l">Alterações na ficha</div>' + (dif.length
+    ? '<div style="overflow-x:auto"><table class="htab dif"><thead><tr><th>Campo</th><th>Atual (v'+x.versao+')</th><th>Proposta (v'+prox+')</th></tr></thead><tbody>'
+      + dif.map(k=>'<tr><td class="vv">'+htm(LBL_CAMPO[k]||k)+'</td><td class="old">'+htm(valCampo(k,x[k]))+'</td><td class="new">'+htm(valCampo(k,p.dados[k]))+'</td></tr>').join('')
+      + '</tbody></table></div>'
+    : '<div class="fld-v pend">Nenhum campo da ficha mudou — veja as notas da versão acima.</div>') + '</div>';
+  if(p.status==='pendente')
+    h += '<div class="fnote" style="margin:4px 0 0">Ao ser aprovada, a <b>v'+prox+'</b> vira a versão atual e <b>'+htm(pessoaTxt(a))
+      + '</b> passa a ser o owner (Resp.) da skill.</div>';
+  return h + '<div id="d-prev"></div>';
+}
+function propFooter(x){
+  const p=x.proposta, prox=x.versao+1, posso=papeisQuePosso(x), meu=p.autor.email===USUARIO.email;
+  let ft='';
+  if(posso.length){
+    const faltaDepois=p.exige.filter(k=>!p.aprov[k] && !posso.includes(k));
+    ft += '<button class="btn-p go" onclick="aprovarVersao('+x.id+')">✓ '+(faltaDepois.length?'Aprovar':'Aprovar e publicar v'+prox)+'</button>'
+        + '<button class="btn-s no" onclick="mostrarRejVersao('+x.id+')">Recusar</button>';
+  }
+  if(meu && p.status==='recusada')
+    ft += '<button class="btn-p warn" onclick="abrirNovaVersao('+x.id+')">Corrigir e reenviar</button>'
+        + '<button class="btn-s no" onclick="descartarProposta('+x.id+')">Descartar proposta</button>';
+  else if(meu && p.status==='pendente')
+    ft += '<button class="btn-s no" onclick="descartarProposta('+x.id+')">Cancelar proposta</button>';
+  ft += '<button class="btn-s" onclick="baixarProposta('+x.id+')">⬇ .md da proposta</button>'
+      + '<span class="sp">v'+x.versao+' → v'+prox+'</span>';
+  return ft;
+}
+function prevMd(id){
+  const el=document.getElementById('d-prev'), b=document.getElementById('btn-prev');
+  if(el.innerHTML){ el.innerHTML=''; b.textContent='Ver conteúdo do .md'; return; }
+  el.innerHTML='<div class="fld" style="margin-top:18px"><div class="fld-l">Conteúdo de skill_'+htm(byId(id).slug)+'.md</div><div class="pre">'+htm(mdFor(byId(id)))+'</div></div>';
+  b.textContent='Ocultar conteúdo do .md';
+}
+
+/* ── formulário ──────────────────────────────────────────────────────── */
+/* consultor escolhe entre CONS e EXT; só o admin marca ORG */
+function selFontes(atual){
+  const ops = isAdmin() ? FONTES : (atual==='org' ? FONTES.filter(o=>o.id==='org') : FONTES.filter(o=>o.id!=='org'));
+  document.getElementById('i-f').innerHTML = ops.map(o=>'<option value="'+o.id+'">'+o.sigla+' — '+htm(o.nome)+'</option>').join('');
+  document.getElementById('i-f-hint').textContent = isAdmin()
+    ? 'ORG = skill oficial da Gradus.' : 'Skills ORG são marcadas pela Gestão Metodológica.';
+}
+function selCats(){
+  document.getElementById('i-c').innerHTML = '<option value="">Selecione...</option>'
+    + catsTodas().map(c=>'<option value="'+c.id+'">'+htm(c.nome)+'</option>').join('');
+}
+function selOpts(id,vals){
+  document.getElementById(id).innerHTML = vals.map(v=>'<option value="'+htm(v)+'">'+htm(v)+'</option>').join('');
+}
+const CAMPOS=[['i-d','d'],['i-r','r'],['i-c','c'],['i-f','f'],['i-t','t'],['i-m','m'],['i-e','e'],['i-amp','amp'],['i-hr','hr'],['i-q','q'],
+              ['i-esc','esc'],['i-in','inp'],['i-out','out'],['i-uso','uso'],['i-ex','ex'],['i-com','com'],['i-link','link'],['i-repo','repo'],['i-obs','obs']];
+function abrirForm(){
+  EDIT_ID=null; VER_ID=null; document.getElementById('f-ver').style.display='none';
+  selOpts('i-t',OPC_TIPO); selOpts('i-m',ORD_MET); selCats(); selFontes();
+  CAMPOS.forEach(([id])=>{ const el=document.getElementById(id); el.classList.remove('bad','imp');
+    if(el.tagName==='SELECT') el.selectedIndex=0; else el.value=''; });
+  document.getElementById('i-r').value=USUARIO.iniciais;
+  document.getElementById('i-e').value='WIP';
+  document.getElementById('i-f').value='cons';
+  FORM_MODO='novo'; ARQ_SEL=null; pintarArquivoSel(); pintarBlocoArquivo(); limparImportacao();
+  document.getElementById('f-t').textContent='Adicionar skill ao repositório';
+  document.getElementById('f-s').innerHTML='Preencha o que já souber — o que faltar entra na ficha como pendência do responsável';
+  document.getElementById('f-note').className='fnote';
+  document.getElementById('f-note').innerHTML = '<strong>Como funciona:</strong> ao publicar, a skill aparece na hora para todos em <b>Disponíveis</b> '
+    + 'e você passa a ser o owner (Resp.). Depois disso, mudanças entram como <b>nova versão</b>, com a sua aprovação.';
+  document.getElementById('f-err').className='ferr';
+  document.getElementById('f-f').innerHTML =
+    '<button class="btn-p go" onclick="salvar(\'aprovada\')">⬆ Publicar skill</button>'
+    + '<button class="btn-s" onclick="fechar(\'m-form\')">Cancelar</button>';
+  document.getElementById('m-form').classList.add('show');
+  setTimeout(()=>document.getElementById('i-d').focus(),80);
+}
+function editar(id){
+  const x=byId(id); if(!x) return;
+  EDIT_ID=id; VER_ID=null; document.getElementById('f-ver').style.display='none';
+  selOpts('i-t',OPC_TIPO); selOpts('i-m',ORD_MET); selCats(); selFontes(x.f);
+  CAMPOS.forEach(([cid,k])=>{ const el=document.getElementById(cid); el.classList.remove('bad','imp');
+    el.value = (x[k]===null||x[k]===undefined)?'':x[k]; });
+  FORM_MODO = x.status==='aprovada' ? 'editar-pub' : 'editar-pend';
+  ARQ_SEL = x.status!=='aprovada' ? (x.arquivoNovo||null) : null; pintarArquivoSel(); pintarBlocoArquivo(); limparImportacao();
+  document.getElementById('f-t').textContent='Editar ficha — '+x.d;
+  document.getElementById('f-s').innerHTML='Completando o que estava pendente na ficha';
+  document.getElementById('f-note').className='fnote';
+  document.getElementById('f-note').innerHTML = x.status==='aprovada'
+    ? '<strong>Skill já publicada:</strong> as alterações valem na hora para todos. Ajuste do admin: não gera versão nova e não muda o owner.'
+    : '<strong>Sugestão pendente:</strong> ao salvar, ela volta para a fila de aprovação'+(x.status==='recusada'?' e o motivo da recusa anterior é apagado.':'.');
+  document.getElementById('f-err').className='ferr';
+  const alvo = x.status==='aprovada' ? 'aprovada' : 'pendente';
+  document.getElementById('f-f').innerHTML =
+    '<button class="btn-p" onclick="salvar(\''+alvo+'\')">Salvar alterações</button>'
+    + '<button class="btn-s" onclick="fechar(\'m-form\')">Cancelar</button>'
+    + '<span class="sp">skill_'+htm(x.slug)+'.md</span>';
+  document.getElementById('m-det').classList.remove('show');
+  document.getElementById('m-form').classList.add('show');
+}
+function lerForm(){
+  const g=id=>document.getElementById(id).value.trim();
+  return {c:g('i-c'),f:g('i-f'),m:g('i-m'),amp:num(g('i-amp')),d:g('i-d'),t:g('i-t'),hr:num(g('i-hr')),q:num(g('i-q')),e:g('i-e'),
+    esc:g('i-esc'),inp:g('i-in'),out:g('i-out'),uso:g('i-uso'),ex:g('i-ex'),com:g('i-com'),link:g('i-link'),repo:g('i-f')==='ext'?g('i-repo'):'',obs:g('i-obs')};
+}
+function validarForm(extra, pedeArquivo){
+  const g=id=>document.getElementById(id).value.trim();
+  const obr=[['i-d','Nome da skill'],['i-c','Categoria'],['i-esc','Escopo — o que ela entrega']].concat(extra||[]);
+  CAMPOS.concat([['i-notas']]).forEach(([id])=>document.getElementById(id).classList.remove('bad'));
+  document.getElementById('drop-arq').classList.remove('bad');
+  const faltam=[]; let aviso='';
+  obr.forEach(([id,l])=>{ if(!g(id)){ faltam.push(l); document.getElementById(id).classList.add('bad'); } });
+  if(pedeArquivo){
+    /* regra: toda skill nova e toda nova versão levam o arquivo; skills da internet (EXT) levam o link do repositório */
+    if(g('i-f')==='ext'){
+      const u=g('i-repo');
+      if(!u){ faltam.push('Link do repositório'); document.getElementById('i-repo').classList.add('bad'); }
+      else if(!/^https?:\/\/\S+$/i.test(u)){ aviso='O link do repositório precisa começar com http:// ou https://.'; document.getElementById('i-repo').classList.add('bad'); }
+    } else if(!ARQ_SEL){ faltam.push('Arquivo da skill'); document.getElementById('drop-arq').classList.add('bad'); }
+  }
+  const err=document.getElementById('f-err');
+  if(faltam.length || aviso){
+    err.className='ferr show';
+    err.textContent=[faltam.length?'Falta preencher: '+faltam.join(' · ')+'.':'', aviso].filter(Boolean).join(' ');
+    document.getElementById('f-bd').scrollTop=0; return false;
+  }
+  err.className='ferr'; return true;
+}
+/* bloco de arquivo do formulário: aparece no cadastro e na nova versão; EXT troca o arquivo obrigatório pelo link */
+let FORM_MODO='novo';   /* novo | versao | editar-pend | editar-pub */
+function pintarBlocoArquivo(){
+  const ext=document.getElementById('i-f').value==='ext', pedeArq=FORM_MODO!=='editar-pub', versao=FORM_MODO==='versao';
+  document.getElementById('f-imp').style.display = (FORM_MODO==='novo' || versao) ? '' : 'none';
+  document.getElementById('f-arq').style.display = (pedeArq || ext) ? 'block' : 'none';
+  document.getElementById('f-arq-drop').style.display = pedeArq ? '' : 'none';
+  document.getElementById('f-arq-repo').style.display = ext ? '' : 'none';
+  document.getElementById('f-arq-tit').textContent = versao ? 'Arquivo da nova versão' : 'Arquivo da skill';
+  document.getElementById('lbl-arq').innerHTML = (versao ? 'Arquivo da nova versão' : 'Arquivo da skill')
+    + (ext ? ' <span style="text-transform:none;letter-spacing:0;font-weight:600">(opcional)</span>' : ' <span class="rq">*</span>');
+  document.getElementById('hint-arq').textContent = ext
+    ? 'Opcional para skills da internet — o link do repositório abaixo é obrigatório.'
+    : 'O arquivo que quem aprova vai baixar e testar: .skill, .html, .py, .zip... (até 20 MB).';
+}
+function salvar(status){
+  if(!validarForm(null, EDIT_ID===null || byId(EDIT_ID).status!=='aprovada')) return;
+  const dados=lerForm(), eu=pessoaAtual();
+  /* INTEGRAÇÃO: repetir esta regra no backend — só admin define ORG */
+  if(!isAdmin() && dados.f==='org' && !(EDIT_ID!==null && byId(EDIT_ID).f==='org')) dados.f='cons';
+  if(EDIT_ID!==null){
+    const x=byId(EDIT_ID);
+    Object.assign(x,dados);
+    if(ARQ_SEL && !x.versao) x.arquivoNovo=ARQ_SEL;   /* ainda não publicada: troca o arquivo enviado */
+    x.status=status; if(status!=='recusada') x.motivo='';
+    x.ultMod=Object.assign({},eu,{data:hoje()});   /* ajuste direto: não gera versão nem muda o owner */
+    if(status==='aprovada' && !x.versao) iniciarHistorico(x,'Versão inicial',x.owner,hoje());
+    derivar(x); EDIT_ID=null;
+    fechar('m-form'); render();
+    toast(status==='aprovada' ? 'Ficha de <b>'+htm(x.d)+'</b> atualizada e publicada.' : 'Ficha de <b>'+htm(x.d)+'</b> atualizada e enviada para aprovação.','ok');
+    return;
+  }
+  /* skill nova: quem cadastra é o criador e o primeiro owner */
+  const it=mkItem(Object.assign({owner:eu},dados),status,eu.iniciais);
+  it.autorEmail=eu.email; it.origem='novo'; it.arquivoNovo=ARQ_SEL;
+  if(status==='aprovada') iniciarHistorico(it,'Versão inicial');
+  ITENS.push(it);
+  fechar('m-form'); montarChips();
+  if(status==='aprovada'){ VIEW='disp'; render(); toast('<b>'+htm(it.d)+'</b> publicada no repositório.','ok'); }
+  else { VIEW=isAdmin()?'pend':'minhas'; render(); toast(isAdmin()
+      ? '<b>'+htm(it.d)+'</b> salva na fila de pendentes.'
+      : '<b>'+htm(it.d)+'</b> enviada para aprovação da Gestão Metodológica. Você acompanha em <b>Minhas sugestões</b>.','ok'); }
+}
+
+/* ── ficha por .md: template para o Claude preencher + importação ──
+   O template tem um cabeçalho "chave: valor" e seções "## ..." fixas. A importação também aceita a ficha .md
+   exportada pelo próprio repositório. Importar só preenche o formulário — a pessoa revisa, anexa o arquivo e publica. */
+const SEC_MD = [['esc','O que ela entrega'],['inp','O que é necessário para rodar'],['out','O que sai no final'],['uso','Como usar'],
+  ['ex','Exemplos de uso'],['com','Backlog e melhorias previstas'],['link','Onde encontrar'],['obs','Observações']];
+const SEC_MD_EXTRA = {'o-que-mudou-nesta-versao':'notas','repositorio-de-origem-internet':'repo','backlog-e-melhorias':'com'};
+function templateMd(x){
+  const versao=!!x, v=k=>(x && x[k]!=null) ? String(x[k]) : '';
+  const lista=(k,num)=>linhas(v(k)).map((l,i)=>(num?(i+1)+'. ':'- ')+l.replace(/^\d+[.)]\s*/,'')).join('\n');
+  const fontes=FONTES.filter(o=>isAdmin()||o.id!=='org').map(o=>o.sigla).join(' | ');
+  const L=['---',
+    'nome: '+v('d'),
+    'categoria: '+(x?catDe(x.c).nome:'')+'   # '+CATEGORIAS.map(c=>c.nome).join(' | '),
+    'metodologia: '+v('m').replace('—','')+'   # '+ORD_MET.join(' | '),
+    'formato: '+v('t')+'   # '+OPC_TIPO.join(' | '),
+    'estagio: '+(x && x.est!=='—' ? x.est : '')+'   # '+ORD_EST.join(' | ')+'  (WIP = em desenvolvimento, MVP1 = primeira versão utilizável)',
+    'fonte: '+(x?fonteDe(x.f).sigla:'')+'   # '+fontes+'  (CONS = feita por consultor, EXT = trazida da internet)',
+    'amplitude: '+v('amp')+'   # 1 Geral Gradus | 2 Geral na metodologia | 3 Análise específica — em branco se não souber',
+    'impacto_horas: '+v('hr')+'   # 1 a 4 — NÃO estimar: deixar em branco para o consultor',
+    'impacto_qualidade: '+v('q')+'   # 1 a 4 — NÃO estimar: deixar em branco para o consultor',
+    'repositorio: '+v('repo')+'   # só para fonte EXT: link https:// do repositório original',
+    '---','',
+    '<!--',
+    'INSTRUÇÕES PARA O CLAUDE',
+    versao
+      ? 'Esta é a ficha da versão atual (v'+x.versao+') da skill "'+x.d+'" no Repositório de Skills da Gradus. O consultor anexou a NOVA versão da skill: atualize a ficha com base nela e preencha a seção "O que mudou nesta versão" (1 a 3 linhas).'
+      : 'Preencha esta ficha para cadastrar uma skill no Repositório de Skills da Gradus, com base no arquivo da skill que o consultor anexou (SKILL.md, .skill, .html, .py...).',
+    '- Mantenha exatamente as chaves do cabeçalho e os títulos "## ..."; não crie nem renomeie seções.',
+    '- No cabeçalho, use um dos valores listados depois do "#" de cada linha (o comentário pode ficar).',
+    '- Escreva em português, direto, pensando no consultor que vai procurar a skill no repositório.',
+    '- "O que ela entrega": 2 ou 3 linhas sobre o resultado, não o passo a passo.',
+    '- Listas: um item por linha começando com "- ". Em "Como usar", passos numerados "1.", "2."...',
+    '- NÃO invente impacto em horas, impacto em qualidade, amplitude nem exemplos de projetos: se a skill não disser, deixe em branco.',
+    '- Devolva o arquivo .md completo, pronto para o consultor importar no repositório.',
+    '-->','',
+    '# '+(v('d')||'Nome da skill'),''];
+  SEC_MD.forEach(([k,t])=>{
+    L.push('## '+t);
+    L.push(['inp','out','ex','com'].includes(k) ? lista(k) : (k==='uso' ? lista(k,true) : v(k)));
+    L.push('');
+  });
+  if(versao){ L.push('## O que mudou nesta versão'); L.push(''); L.push(''); }
+  return L.join('\n');
+}
+function baixarTemplate(){
+  const x = FORM_MODO==='versao' && VER_ID!==null ? byId(VER_ID) : null;
+  const nome = x ? 'template_nova-versao_'+x.slug+'_v'+(x.versao+1)+'.md' : 'template_skill-nova.md';
+  baixa(nome, templateMd(x));
+  toast('Template <b>'+htm(nome)+'</b> baixado. Anexe no Claude junto com o arquivo da skill e peça para preencher.','ok');
+}
+/* aceita id, sigla ou nome ("ORG", "ORG (Organização)", "internet"...); devolve null se não reconhecer */
+function acharFonte(v){
+  const tok=slug(String(v||'').split(/[\s(]/)[0]);
+  return FONTES.find(o=>o.id===tok || slug(o.sigla)===tok || slug(o.nome)===tok || o.alias.includes(tok)) || null;
+}
+function lerFichaMd(texto){
+  const t=String(texto||'').replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n');
+  const cab={}, dados={}, avisos=[]; let corpo=t;
+  const fm=t.match(/^---\n([\s\S]*?)\n---[ \t]*(?:\n|$)/);
+  if(fm){
+    corpo=t.slice(fm[0].length);
+    fm[1].split('\n').forEach(l=>{
+      const m=l.match(/^\s*([A-Za-zÀ-ú_]+)\s*:\s*(.*)$/); if(!m) return;
+      const k=slug(m[1]).replace(/-/g,'_');
+      const val=m[2].replace(/(^|\s)#\s.*$/,'').trim().replace(/^["']|["']$/g,'').trim();   /* tira o comentário "# ..." */
+      if(val && cab[k]===undefined) cab[k]=val;
+    });
+  }
+  corpo=corpo.replace(/<!--[\s\S]*?-->/g,'');
+  const secs={}; let atual=null, h1='';
+  corpo.split('\n').forEach(l=>{
+    const h=l.match(/^(#{1,3})\s+(.+?)\s*$/);
+    if(h){ if(h[1]==='#'){ if(!h1) h1=h[2]; atual=null; } else { atual=slug(h[2]); secs[atual]=secs[atual]||[]; } return; }
+    if(atual) secs[atual].push(l);
+  });
+  const nome = cab.nome || (h1 && h1!=='Nome da skill' ? h1 : '');
+  if(nome) dados.d=nome;
+  if(cab.categoria){ const C=catDe(cab.categoria);
+    if(C.id!=='sem' || slug(cab.categoria)==='sem-categoria') dados.c=C.id;
+    else avisos.push('Categoria "'+cab.categoria+'" não está na lista — escolha no formulário.'); }
+  const daLista=(v,ops,rot,k)=>{ if(!v) return; const o=ops.find(x=>x.toLowerCase()===v.toLowerCase());
+    if(o) dados[k]=o; else avisos.push(rot+' "'+v+'" não reconhecido — escolha no formulário.'); };
+  daLista(cab.metodologia, ORD_MET, 'Metodologia', 'm');
+  daLista(cab.formato, OPC_TIPO, 'Formato', 't');
+  daLista(cab.estagio, ORD_EST, 'Estágio', 'e');
+  const fonteTxt = cab.origem || cab.fonte, fo = fonteTxt ? acharFonte(fonteTxt) : null;
+  if(fo) dados.f=fo.id;
+  else if(fonteTxt && !/reposit/i.test(fonteTxt)) avisos.push('Fonte "'+fonteTxt+'" não reconhecida — escolha no formulário.');
+  const nota=(v,max)=>{ const n=parseInt(String(v||'').trim(),10); return (n>=1 && n<=max) ? n : null; };
+  [['amp','amplitude',3],['hr','impacto_horas',4],['q','impacto_qualidade',4]].forEach(([k,c,max])=>{ const n=nota(cab[c],max); if(n) dados[k]=n; });
+  if(cab.repositorio) dados.repo=cab.repositorio;
+  const mapa={}; SEC_MD.forEach(([k,tt])=>{ mapa[slug(tt)]=k; }); Object.assign(mapa, SEC_MD_EXTRA);
+  const descTipos=Object.values(TIPO_DESC);
+  Object.entries(secs).forEach(([sl,ls])=>{
+    const k=mapa[sl]; if(!k) return;
+    let v=ls.map(l=>l.trim()).filter(l=>l && !/^_.*_$/.test(l) && !descTipos.includes(l));   /* tira marcadores "_Não documentado_" */
+    if(k!=='esc' && k!=='notas' && k!=='obs') v=v.map(l=>l.replace(/^(?:[-*+]\s+(?:\[[ xX]\]\s+)?|\d+[.)]\s+)/,''));
+    const val=v.join('\n').trim(); if(val) dados[k]=val;
+  });
+  return {dados, avisos};
+}
+async function importarMd(f){
+  if(!f) return;
+  document.getElementById('i-md').value='';
+  let texto; try{ texto=await f.text(); }catch(e){ toast('Não foi possível ler o arquivo.','err'); return; }
+  const {dados, avisos}=lerFichaMd(texto);
+  if(!Object.keys(dados).length){
+    mostrarImp('<span class="av">⚠ Nenhum campo reconhecido em <b>'+htm(f.name)+'</b>. Use o <b>Template para o Claude</b> como base.</span>'); return; }
+  /* consultor não marca ORG; numa nova versão de skill ORG, a fonte continua ORG */
+  if(dados.f && !isAdmin()){
+    const atual = VER_ID!==null ? byId(VER_ID).f : null;
+    if(atual==='org') dados.f='org';
+    else if(dados.f==='org'){ dados.f='cons'; avisos.push('Fonte ORG só é marcada pela Gestão Metodológica — ficou CONS.'); }
+  }
+  const CAMPO={d:'i-d',c:'i-c',f:'i-f',m:'i-m',t:'i-t',e:'i-e',amp:'i-amp',hr:'i-hr',q:'i-q',esc:'i-esc',inp:'i-in',out:'i-out',
+               uso:'i-uso',ex:'i-ex',com:'i-com',link:'i-link',repo:'i-repo',obs:'i-obs',notas:'i-notas'};
+  let n=0;
+  Object.entries(dados).forEach(([k,v])=>{
+    const id=CAMPO[k]; if(!id || (k==='notas' && FORM_MODO!=='versao')) return;
+    const el=document.getElementById(id);
+    if(el.tagName==='SELECT' && ![...el.options].some(o=>o.value===String(v))) return;
+    el.value=v; el.classList.remove('bad'); el.classList.add('imp'); n++;
+  });
+  pintarBlocoArquivo();
+  const falta=[['amp','amplitude'],['hr','impacto em horas'],['q','impacto em qualidade']].filter(([k])=>dados[k]==null).map(([,l])=>l);
+  mostrarImp('<span class="ok">✓ '+n+' campo(s) preenchido(s) a partir de '+htm(f.name)+'</span> (em verde). Revise antes de publicar'
+    + (falta.length ? ' e complete '+falta.join(', ')+' se souber' : '') + '.'
+    + (avisos.length ? '<br>'+avisos.map(a=>'<span class="av">⚠ '+htm(a)+'</span>').join('<br>') : ''));
+  toast('Ficha importada: <b>'+n+'</b> campo(s) preenchido(s). Revise e anexe o arquivo da skill.','ok');
+}
+function mostrarImp(h){ const el=document.getElementById('f-imp-res'); el.innerHTML=h; el.className='imp-res show'; }
+function limparImportacao(){ const el=document.getElementById('f-imp-res'); el.innerHTML=''; el.className='imp-res'; }
+
+/* ── exportações e base ──────────────────────────────────────────────── */
+function expCadastros(){
+  const novas=ITENS.filter(x=>x.origem!=='base');
+  if(!novas.length){ toast('Nenhum cadastro novo nesta sessão.','err'); return; }
+  const lim=novas.map(x=>({fonte:x.f,avaliacao_media:mediaAval(x).media,avaliacoes:x.avaliacoes.filter(a=>!a.demo),categoria:x.c,categoria_nome:x.catL,metodologia:x.m,amplitude:x.amp,nome:x.d,formato:x.t,responsavel:x.r,impacto_horas:x.hr,
+    impacto_qualidade:x.q,estagio:x.est,escopo:x.esc,inputs:x.inp,output:x.out,como_usar:x.uso,exemplos:x.ex,
+    backlog:x.com,onde_encontrar:x.link,repositorio:x.repo,observacoes:x.obs,status:x.status,motivo_recusa:x.motivo,
+    cadastrado_por:pessoaTxt(x.criador),cadastrado_por_email:x.criador.email,owner_email:x.owner.email,versao:x.versao,historico:x.historico.map(h=>({versao:h.versao,data:h.data,autor_email:h.autor.email,autor_iniciais:h.autor.iniciais,notas:h.notas,arquivo:h.arquivo?{nome:h.arquivo.nome,tamanho:h.arquivo.tamanho}:null})),cadastrado_em:x.criado,arquivo_md:'skill_'+x.slug+'.md'}));
+  baixa('cadastros_repositorio_skills.json', JSON.stringify(lim,null,2), 'application/json');
+  toast('<b>'+novas.length+'</b> cadastro(s) exportado(s) para levar à base oficial.','ok');
+}
+function expCatalogo(){
+  const f=filtrados();
+  if(!f.length){ toast('Nenhuma skill nos filtros atuais.','err'); return; }
+  const rows=f.map(x=>({'Fonte':fonteDe(x.f).sigla,'Categoria':x.catL,'Metodologia':x.m,'Amplitude':x.amp||'','Nome':x.d,'Formato':x.t,'Resp':x.r,'Versão':x.versao?'v'+x.versao:'','Horas':x.hr||'',
+    'Qualid':x.q||'','Estágio':x.est,'Disponibilidade':x.disp,'Escopo':x.esc,'Inputs':x.inp,'Output':x.out,
+    'Como usar':x.uso,'Exemplos':x.ex,'Backlog':x.com,'Onde encontrar':x.link,'Repositório':x.repo,'Obs':x.obs,
+    'Documentação':x.docL,'Avaliação média':fmtNota(mediaAval(x).media),'Nº avaliações':mediaAval(x).n,'Publicação':x.status,'Arquivo .md':'skill_'+x.slug+'.md'}));
+  baixa('catalogo_skills_'+f.length+'.csv', Papa.unparse(rows), 'text/csv');
+  toast('Catálogo com <b>'+f.length+'</b> skill(s) exportado.','ok');
+}
+const HDR_MAP={'metodologia ou escopo':'m','metodologia':'m','amplitude':'amp','descrição':'d','descricao':'d','nome':'d',
+  'tipo':'t','formato':'t','repositório':'repo','repositorio':'repo','link do repositório':'repo','link do repositorio':'repo','categoria':'c','fonte':'f','origem':'f','resp':'r','responsável':'r','responsavel':'r','horas':'hr','qualid':'q','qualidade':'q','estágio':'e','estagio':'e',
+  'escopo':'esc','exemplos de uso':'ex','exemplos':'ex','comentários do fórum':'com','comentarios do forum':'com','backlog':'com',
+  'como está':'como','como esta':'como','obs':'obs','observações':'obs','inputs':'inp','output':'out','como usar':'uso','onde encontrar':'link'};
+function fromMatrix(matrix){
+  let hi=-1;
+  for(let i=0;i<Math.min(matrix.length,40);i++){
+    const row=(matrix[i]||[]).map(c=>String(c==null?'':c).trim().toLowerCase());
+    if(row.some(c=>c.startsWith('metodologia')||c==='nome') && row.some(c=>c==='tipo'||c==='formato'||c==='categoria')){ hi=i; break; }
+  }
+  if(hi<0) throw new Error('Cabeçalho não encontrado. Esperado uma linha com "Metodologia ou escopo" (ou "Nome") e "Tipo", "Formato" ou "Categoria".');
+  const hdr=(matrix[hi]||[]).map(c=>String(c==null?'':c).trim().toLowerCase());
+  const map={}; hdr.forEach((h,j)=>{ if(HDR_MAP[h]!==undefined && map[HDR_MAP[h]]===undefined) map[HDR_MAP[h]]=j; });
+  if(map.d===undefined) throw new Error('Coluna "Descrição" (ou "Nome") não encontrada.');
+  const out=[];
+  for(let i=hi+1;i<matrix.length;i++){
+    const row=matrix[i]||[]; const get=k=>map[k]===undefined?'':row[map[k]];
+    if(!String(get('d')||'').trim()) continue;
+    out.push({c:get('c'),f:get('f'),repo:get('repo'),m:get('m'),amp:get('amp'),d:get('d'),t:get('t'),r:get('r'),hr:get('hr'),q:get('q'),e:get('e'),
+      esc:get('esc'),ex:get('ex'),com:get('com'),como:get('como'),obs:get('obs'),
+      inp:get('inp'),out:get('out'),uso:get('uso'),link:get('link')});
+  }
+  if(!out.length) throw new Error('Nenhuma linha preenchida encontrada abaixo do cabeçalho.');
+  return out;
+}
+function handleFile(input){
+  const file=input.files&&input.files[0]; if(!file) return;
+  const ext=file.name.split('.').pop().toLowerCase(), rd=new FileReader();
+  rd.onload=e=>{
+    try{
+      let matrix;
+      if(ext==='csv'){ matrix=Papa.parse(e.target.result,{header:false,skipEmptyLines:false}).data; }
+      else { const wb=XLSX.read(e.target.result,{type:'array'});
+             matrix=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',blankrows:true}); }
+      const lidas=fromMatrix(matrix);
+      const novas=ITENS.filter(x=>x.origem!=='base');
+      const antes={}; ITENS.forEach(x=>{ antes[x.slug]=x; });
+      lidas.forEach(o=>{ const a=antes[slug(o.d)]; if(!a) return;   /* mesma skill: preserva o que a planilha não traz */
+        if(!txt(o.c)) o.c=a.c; if(!txt(o.f)) o.f=a.f; o.avaliacoes=a.avaliacoes; });
+      SEQ=1; ITENS=lidas.map(o=>{
+        const it=mkItem(o,'aprovada'), a=antes[it.slug];
+        if(a){   /* mesma skill: histórico, criador e proposta em análise seguem com ela */
+          it.versao=a.versao; it.historico=a.historico; it.criador=a.criador; it.ultMod=a.ultMod; it.proposta=a.proposta;
+          if(!txt(o.r) || normIni(o.r)===normIni(a.r)) it.owner=a.owner;
+        } else iniciarHistorico(it,'Versão inicial — importada da lista corrida');
+        return derivar(it);
+      });
+      novas.forEach(x=>{ x.id=SEQ++; ITENS.push(x); });
+      montarChips(); render();
+      toast('Base atualizada: <b>'+lidas.length+'</b> skills lidas de '+htm(file.name)+(novas.length?' · '+novas.length+' cadastro(s) desta sessão preservado(s)':''),'ok');
+    }catch(err){ toast('Não foi possível ler a planilha: '+htm(err.message)+' — base anterior mantida.','err'); }
+    input.value='';
+  };
+  if(ext==='csv') rd.readAsText(file,'UTF-8'); else rd.readAsArrayBuffer(file);
+}
+
+/* ── modais ──────────────────────────────────────────────────────────── */
+function fechar(id){ document.getElementById(id).classList.remove('show'); if(id==='m-form'){ EDIT_ID=null; VER_ID=null; ARQ_SEL=null; } }
+function abrirAjuda(){
+  document.getElementById('aj-cat').innerHTML = CATEGORIAS.map(c=>
+    '<div class="fi"><label><span class="tag" style="color:'+c.cor+';border-color:'+c.cor+';background:'+c.bg+'">'+htm(c.nome)+'</span></label>'
+    + '<div class="fld-v" style="font-size:12px">'+htm(c.desc)+'</div></div>').join('');
+  document.getElementById('aj-fonte').innerHTML = FONTES.map(o=>
+    '<div class="fi"><label>'+fontePill(o.id)+' <span style="text-transform:none;letter-spacing:0">'+htm(o.nome)+'</span></label>'
+    + '<div class="fld-v" style="font-size:12px">'+htm(o.desc)+'</div></div>').join('');
+  document.getElementById('m-ajuda').classList.add('show');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ fecharDD(); ['m-det','m-form','m-ajuda','m-ini'].forEach(id=>fechar(id)); }
+  if(e.key==='/' && USUARIO && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){
+    e.preventDefault(); document.getElementById('q').focus();
+  }
+});
+
+/* ── partida: modo demo inicia direto; no PPR espera o ppr.init com o usuário logado ── */
+function usuarioDoPPR(u){
+  const email=String(u.email||'').trim().toLowerCase();
+  return { nome:String(u.nome||email).trim(), email,
+           papel: ADMINS_EMAILS.map(e=>e.toLowerCase()).includes(email) ? 'admin' : 'consulta' };
+}
+function semPPR(msg){
+  document.body.innerHTML='<div style="max-width:520px;margin:15vh auto;padding:28px;background:#fff;border:1px solid #D9DCE6;'
+    +'border-radius:4px;font-family:Nunito,Segoe UI,sans-serif;color:#12376C;text-align:center">'
+    +'<div style="font-size:18px;font-weight:700;margin-bottom:8px">Repositório de Skills</div>'
+    +'<div style="font-size:14px;color:#4A5E73">'+msg+'</div></div>';
+}
+if(MODO_DEMO){
+  iniciar();
+} else {
+  let iniciado=false;
+  window.addEventListener('message', ev=>{
+    if(ev.source!==window.parent || !PPR_ORIGENS.includes(ev.origin)) return;
+    const m=ev.data;
+    if(!m || m.type!=='ppr.init' || !m.payload || !m.payload.user || !m.payload.user.email) return;
+    window.GRADUS_USUARIO=usuarioDoPPR(m.payload.user);
+    if(!iniciado){ iniciado=true; iniciar(); }
+    else { carregarUsuario(); pintarUsuario(); montarAdmBar(); render(); }
+    window.parent.postMessage({type:'ppr.ready'}, ev.origin);
+  });
+  setTimeout(()=>{ if(!iniciado) semPPR(window.parent===window
+      ? 'Esta ferramenta é aberta pelo PPR, que identifica o usuário logado. Acesse pelo catálogo de ferramentas do PPR.'
+      : 'Não foi possível identificar o usuário logado no PPR. Recarregue a página.'); }, 6000);
+}
+</script>
+</body>
+</html>

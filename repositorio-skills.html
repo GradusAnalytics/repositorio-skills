@@ -47,7 +47,12 @@ button,input,select,textarea{font-family:inherit}
 .me-av{width:28px;height:28px;border-radius:50%;background:var(--brand-blue);color:#fff;display:flex;align-items:center;
   justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
 .me-av.adm{background:var(--accent1)}
-.me-t{line-height:1.25;min-width:0}
+.me-t{line-height:1.25;min-width:0;cursor:pointer;border-radius:4px}.me-t:hover .me-n{text-decoration:underline}.me-t:focus-visible{outline:2px solid rgba(255,255,255,.7);outline-offset:2px}
+.conta-tk{font-family:Consolas,Menlo,monospace;background:#F4F6FA;border:1px solid var(--g-border);border-radius:3px;padding:8px 10px;font-size:12.5px;word-break:break-all;color:var(--dk1)}
+.conta-acoes{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.conta-passos{margin:6px 0 0 18px;padding:0;font-size:12.5px;line-height:1.65;color:var(--g-text2)}
+.conta-passos code{font-family:Consolas,Menlo,monospace;font-size:11.5px;background:#F4F6FA;padding:1px 5px;border-radius:3px}
+.btn-s.perigo{border-color:rgba(128,0,0,.35);color:var(--accent3)}
 .me-n{font-size:11.5px;font-weight:700;color:#fff;white-space:nowrap}
 .me-r{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(157,177,207,.95)}
 .demo-sw{display:flex;align-items:center;gap:7px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
@@ -649,9 +654,9 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
 
 <!-- ═══════════════════ MODAL INICIAIS ═══════════════════ -->
 <div class="mbg" id="m-ini" onclick="if(event.target===this)fechar('m-ini')">
-  <div class="mo" style="max-width:430px">
+  <div class="mo" style="max-width:540px">
     <div class="mo-hd">
-      <div><h2>Suas iniciais</h2><div class="mo-sub">É assim que você aparece como Resp. nos cards</div></div>
+      <div><h2>Sua conta</h2><div class="mo-sub" id="conta-sub"></div></div>
       <button class="mo-x" aria-label="Fechar" onclick="fechar('m-ini')"><svg class="gi"><use href="#i-x"/></svg></button>
     </div>
     <div class="mo-bd">
@@ -659,12 +664,28 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
       <div class="fi"><label>Iniciais</label>
         <input type="text" id="i-ini" maxlength="4" onkeydown="if(event.key==='Enter')salvarIniciais()"
           style="text-transform:uppercase;font-size:18px;font-weight:700;letter-spacing:2px;width:130px">
-        <div class="hint" id="ini-hint"></div></div>
+        <div class="hint" id="ini-hint"></div>
+        <div class="conta-acoes">
+          <button class="btn-p" onclick="salvarIniciais()">Salvar iniciais</button>
+          <button class="btn-s" onclick="usarIniciaisPadrao()">Usar a sugestão</button>
+        </div></div>
+
+      <div class="fsec" style="margin-top:22px">Usar o repositório pelo Claude</div>
+      <div class="hint" style="margin:0 0 10px">Com o seu token e as instruções, o Claude busca, instala, cadastra e versiona skills deste repositório pela API do PPR, com as mesmas permissões que você tem aqui.</div>
+      <div class="fi"><label>Token de API</label><div id="conta-token"></div></div>
+      <div class="fi" style="margin-top:12px"><label>Instruções para o Claude</label>
+        <div class="conta-acoes" style="margin-top:0">
+          <button class="btn-p" id="btn-md-claude" onclick="baixarInstrucoesClaude()"><svg class="gi"><use href="#i-dl"/></svg> Baixar instruções (.md)</button>
+        </div>
+        <ol class="conta-passos">
+          <li>Gere o token acima e clique em <b>Copiar comando</b>.</li>
+          <li>Cole o comando num terminal seu (fora do Claude) e reinicie o Claude Code.</li>
+          <li>Salve o .md como <code>~/.claude/skills/repositorio-skills/SKILL.md</code> ou cole o conteúdo na conversa.</li>
+        </ol>
+        <div class="hint">O arquivo não contém o token. Nunca cole o token na conversa com o Claude.</div></div>
     </div>
     <div class="mo-ft">
-      <button class="btn-p" onclick="salvarIniciais()">Salvar</button>
-      <button class="btn-s" onclick="usarIniciaisPadrao()">Usar a sugestão</button>
-      <button class="btn-s" onclick="fechar('m-ini')">Cancelar</button>
+      <button class="btn-s" onclick="fechar('m-ini')">Fechar</button>
     </div>
   </div>
 </div>
@@ -957,6 +978,82 @@ function carregarUsuario(){
   USUARIO = { nome, email, iniciais, papel: u.papel==='admin' ? 'admin' : 'consulta' };
   return USUARIO;
 }
+/* ── Sua conta: token de API e instruções para o Claude (ponte ppr.skills.*) ── */
+let TOKEN_VAL, TOKEN_ERRO=null, TOKEN_VISIVEL=false, TOKEN_CONFIRMA=false, TOKEN_OCUPADO=false;
+function abrirConta(){
+  abrirIniciais();
+  document.getElementById('conta-sub').textContent = USUARIO.nome + (USUARIO.email ? ' · ' + USUARIO.email : '');
+  TOKEN_CONFIRMA=false; TOKEN_VISIVEL=false;
+  if(PPR_ORIGEM && TOKEN_VAL===undefined) lerToken(); else pintarConta();
+}
+function tokenMascarado(t){ return '••••••••-••••-••••-••••-••••••••' + t.slice(-4); }
+function pintarConta(){
+  const el=document.getElementById('conta-token'), md=document.getElementById('btn-md-claude');
+  if(!el) return;
+  md.disabled = !PPR_ORIGEM;
+  if(!PPR_ORIGEM){ el.innerHTML='<div class="hint" style="margin:0">Disponível quando a ferramenta é aberta pelo PPR.</div>'; return; }
+  if(TOKEN_ERRO){ el.innerHTML='<div class="hint" style="margin:0;color:var(--accent3)">Não foi possível falar com o PPR: '+htm(TOKEN_ERRO)
+      +'</div><div class="conta-acoes"><button class="btn-s" onclick="lerToken()">Tentar de novo</button></div>'; return; }
+  if(TOKEN_VAL===undefined || TOKEN_OCUPADO){ el.innerHTML='<div class="hint" style="margin:0">Carregando…</div>'; return; }
+  if(!TOKEN_VAL){ el.innerHTML='<div class="hint" style="margin:0 0 4px">Você ainda não tem um token.</div>'
+      +'<div class="conta-acoes"><button class="btn-p" onclick="gerarToken()">Gerar token</button></div>'; return; }
+  el.innerHTML='<div class="conta-tk" id="conta-tk">'+htm(TOKEN_VISIVEL ? TOKEN_VAL : tokenMascarado(TOKEN_VAL))+'</div>'
+    + '<div class="conta-acoes">'
+    + '<button class="btn-s" onclick="TOKEN_VISIVEL=!TOKEN_VISIVEL;pintarConta()">'+(TOKEN_VISIVEL?'Ocultar':'Mostrar')+'</button>'
+    + '<button class="btn-s" onclick="copiarTexto(TOKEN_VAL,\'Token copiado.\')">Copiar token</button>'
+    + '<button class="btn-s" onclick="copiarTexto(comandoToken(),\'Comando copiado. Cole num terminal seu e reinicie o Claude Code.\')">Copiar comando</button>'
+    + (TOKEN_CONFIRMA
+        ? '<button class="btn-s perigo" onclick="gerarToken()">Confirmar: o token atual deixa de funcionar</button>'
+          + '<button class="btn-s" onclick="TOKEN_CONFIRMA=false;pintarConta()">Cancelar</button>'
+        : '<button class="btn-s" onclick="TOKEN_CONFIRMA=true;pintarConta()">Regenerar</button>')
+    + '</div>';
+}
+function comandoToken(){
+  return /Win/i.test(navigator.platform||navigator.userAgent) ? 'setx PPR_TOKEN "'+TOKEN_VAL+'"'
+       : "echo 'export PPR_TOKEN=\""+TOKEN_VAL+"\"' >> ~/.zshrc";
+}
+async function lerToken(){
+  TOKEN_ERRO=null; TOKEN_OCUPADO=true; pintarConta();
+  try{
+    const r=await pprData('ppr.skills.token', {acao:'ler'});
+    if(r.status!==200) throw new Error(r.erro||('erro '+r.status));
+    TOKEN_VAL=r.token||null;
+  }catch(e){ TOKEN_ERRO=e.message; }
+  TOKEN_OCUPADO=false; pintarConta();
+}
+async function gerarToken(){
+  const tinha=!!TOKEN_VAL;
+  TOKEN_ERRO=null; TOKEN_OCUPADO=true; TOKEN_CONFIRMA=false; pintarConta();
+  try{
+    const r=await pprData('ppr.skills.token', {acao:'gerar'});
+    if(r.status!==201) throw new Error(r.erro||('erro '+r.status));
+    TOKEN_VAL=r.token; TOKEN_VISIVEL=true;
+    toast(tinha ? 'Token regenerado. O anterior deixou de funcionar: atualize o <b>PPR_TOKEN</b> nas suas máquinas.' : 'Token gerado.','ok');
+  }catch(e){ TOKEN_ERRO=e.message; }
+  TOKEN_OCUPADO=false; pintarConta();
+}
+function copiarTexto(t, msg){
+  const ok=()=>toast(msg,'ok');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(ok, ()=>copiarTextoFallback(t, ok)); }
+  else copiarTextoFallback(t, ok);
+}
+function copiarTextoFallback(t, ok){
+  const a=document.createElement('textarea'); a.value=t; a.style.position='fixed'; a.style.opacity='0';
+  document.body.appendChild(a); a.select();
+  try{ document.execCommand('copy'); ok(); }catch(e){ toast('Não foi possível copiar. Selecione e copie à mão.','err'); }
+  a.remove();
+}
+async function baixarInstrucoesClaude(){
+  if(!PPR_ORIGEM) return;
+  try{
+    const r=await pprData('ppr.skills.instrucoes', {});
+    if(r.status!==200 || !r.texto) throw new Error(r.erro||('erro '+r.status));
+    const url=URL.createObjectURL(new Blob([r.texto],{type:'text/markdown;charset=utf-8'})), el=document.createElement('a');
+    el.href=url; el.download='repositorio-skills-claude.md'; document.body.appendChild(el); el.click(); el.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  }catch(e){ toast('Não foi possível baixar as instruções ('+htm(e.message)+').','err'); }
+}
 function abrirIniciais(){
   document.getElementById('i-ini').value=USUARIO.iniciais;
   document.getElementById('ini-hint').innerHTML='Sugestão a partir do seu nome: <b>'+htm(iniciaisSugeridas(USUARIO.nome,USUARIO.email))
@@ -1101,8 +1198,8 @@ function iniciar(){
 }
 function pintarUsuario(){
   document.getElementById('me').innerHTML =
-    `<button type="button" class="me-av edit ${isAdmin()?'adm':''}" onclick="abrirIniciais()" title="Suas iniciais — clique para alterar">${htm(USUARIO.iniciais)}</button>
-     <div class="me-t"><div class="me-n">${htm(USUARIO.nome)}</div><div class="me-r">${isAdmin()?'Admin':'Consulta'}</div></div>`;
+    `<button type="button" class="me-av edit ${isAdmin()?'adm':''}" onclick="abrirConta()" title="Sua conta — iniciais, token de API e instruções para o Claude">${htm(USUARIO.iniciais)}</button>
+     <div class="me-t" role="button" tabindex="0" onclick="abrirConta()" onkeydown="if(event.key==='Enter')abrirConta()" title="Sua conta — iniciais, token de API e instruções para o Claude"><div class="me-n">${htm(USUARIO.nome)}</div><div class="me-r">${isAdmin()?'Admin':'Consulta'}</div></div>`;
   const sw=document.getElementById('demo-sw');
   if(MODO_DEMO && !window.GRADUS_USUARIO){
     sw.style.display='flex';

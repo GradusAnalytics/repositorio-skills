@@ -1338,7 +1338,7 @@ function irView(v){ VIEW=v; render(); window.scrollTo({top:0,behavior:'smooth'})
 function notaHTML(x){
   const M=EST_META[x.est], C=catDe(x.c), desc=x.esc||x.uso||x.out||x.ex||x.com||x.obs;
   const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
-  let acoes = `${linkExterno(x) ? btnAcessar(x,'btn-dl') : `<button class="btn-dl" onclick="baixarMd(${x.id})"><svg class="gi"><use href="#i-dl"/></svg> Baixar .md</button>`}
+  let acoes = `${temPacote(x) ? btnPacote(x,'btn-dl') : linkExterno(x) ? btnAcessar(x,'btn-dl') : `<button class="btn-dl" onclick="baixarMd(${x.id})"><svg class="gi"><use href="#i-dl"/></svg> Baixar .md</button>`}
                <button class="btn-gh" onclick="abrirDet(${x.id})">Ver ficha</button>`;
   let flag='';
   if(x.status==='pendente') flag=`<div class="pit-flag"><svg class="gi"><use href="#i-clock"/></svg> <b>Aguardando aprovação</b> da Gestão Metodológica · sugerida por ${htm(pessoaTxt(x.criador))} em ${htm(x.criado)}${x.demo?' · <b>exemplo de demonstração</b>':''}</div>`;
@@ -1630,6 +1630,19 @@ function baixarArqVersao(id,v){ const x=byId(id), h=x && (x.historico||[]).find(
 function baixarArqNovo(id){ const x=byId(id); baixarArquivo(x && x.arquivoNovo); }
 /* skill externa com link: o botão principal leva à skill em vez de baixar a ficha */
 function linkExterno(x){ return x.f==='ext' && /^https?:\/\//i.test(x.repo||'') ? x.repo : ''; }
+/* pacote da versão atual no repositório de conteúdo (gravado pela API do PPR em historico[].pacote) */
+function temPacote(x){ const h=(x.historico||[]).find(e=>e.versao===x.versao); return !!(h && h.pacote && h.pacote.tag); }
+function btnPacote(x, cls){ return '<button class="'+cls+'" onclick="baixarPacote('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar skill (.zip)</button>'; }
+async function baixarPacote(id, versao){
+  if(!PPR_ORIGEM){ toast('O pacote da skill só baixa com a ferramenta aberta pelo PPR.','warn'); return; }
+  try{
+    const r=await pprData('ppr.skills.pacote', {id:String(id), versao:versao||null});
+    if(r.status!==200 || !r.blob) throw new Error(r.erro||('erro '+r.status));
+    const url=URL.createObjectURL(r.blob), el=document.createElement('a');
+    el.href=url; el.download=r.nome||'skill.zip'; document.body.appendChild(el); el.click(); el.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  }catch(e){ toast('Não foi possível baixar o pacote ('+htm(e.message)+').','err'); }
+}
 function btnAcessar(x, cls){ return '<a class="'+cls+'" href="'+htm(linkExterno(x))+'" target="_blank" rel="noopener noreferrer"><svg class="gi"><use href="#i-ext"/></svg> Acessar Skill</a>'; }
 function linkSeguro(u){ return /^https?:\/\//i.test(u) ? '<a href="'+htm(u)+'" target="_blank" rel="noopener noreferrer">'+htm(u)+'</a>' : htm(u); }
 function baixarArqProposta(id){ const x=byId(id); baixarArquivo(x && x.proposta && x.proposta.arquivo); }
@@ -1945,7 +1958,9 @@ function fichaHTML(x){
 function fichaFooter(x){
   const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
   const emAnalise = !!(x.proposta && x.proposta.status==='pendente');
-  let ft = (linkExterno(x) ? btnAcessar(x,'btn-p') : '<button class="btn-p" onclick="baixarMd('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar ficha .md</button>')
+  let ft = (temPacote(x) ? btnPacote(x,'btn-p') + (linkExterno(x) ? btnAcessar(x,'btn-s') : '')
+            + '<button class="btn-s" onclick="baixarMd('+x.id+')">Baixar ficha .md</button>'
+          : linkExterno(x) ? btnAcessar(x,'btn-p') : '<button class="btn-p" onclick="baixarMd('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar ficha .md</button>')
          + '<button class="btn-s" onclick="prevMd('+x.id+')" id="btn-prev">Ver conteúdo do .md</button>'
          + (x.status==='aprovada' && !emAnalise ? '<button class="btn-s" onclick="abrirNovaVersao('+x.id+')"><svg class="gi"><use href="#i-ul"/></svg> Subir nova versão</button>' : '')
          + (podeEditar?'<button class="btn-s" onclick="editar('+x.id+')">Editar ficha</button>':'')

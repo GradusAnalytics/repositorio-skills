@@ -18,8 +18,8 @@ A página não faz login. Ao carregar o iframe, o PPR envia
 A página só aceita a mensagem da janela-mãe e das origens em `PPR_ORIGENS`, monta o
 usuário e responde `ppr.ready`, que acende "Conectado" no cabeçalho do PPR.
 
-- Admin (Gestão Metodológica) = e-mails em `ADMINS_EMAILS`, **a definir**; vazia, todos entram como consulta.
-  É checagem só no navegador, não controle de acesso.
+- Admin (Gestão Metodológica) = quem é **staff no PPR** (`is_staff`), mais os e-mails extras em
+  `ADMINS_EMAILS`; os demais entram como consulta. É checagem só no navegador, não controle de acesso.
 - Aberta fora do PPR, a página mostra um aviso e não inicia. `?demo=1` liga o modo demonstração
   (perfis fictícios) para testar sem o PPR.
 

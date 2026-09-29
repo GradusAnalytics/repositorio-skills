@@ -855,7 +855,8 @@ const BASE = [
    Só aceitamos a mensagem vinda da janela-mãe e de uma das origens abaixo.
    Fora do PPR a página não inicia; para testar sem o PPR, abrir com ?demo=1. */
 const PPR_ORIGENS = ['https://ppr.gradusanalytics.com.br', 'https://pprdev.gradusanalytics.com.br'];
-/* Quem é admin (Gestão Metodológica) na ferramenta. A definir — enquanto vazia, todos entram como consulta.
+/* Quem é admin (Gestão Metodológica) na ferramenta: todo staff do PPR (is_staff no ppr.init)
+   e, além deles, os e-mails desta lista. Os demais entram como consulta.
    Atenção: a checagem é só no navegador; não é controle de acesso de verdade. */
 const ADMINS_EMAILS = [];
 const MODO_DEMO = /[?&]demo=1(&|$)/.test(location.search);   /* seletor de perfil fictício, só para testes */
@@ -2250,7 +2251,7 @@ document.addEventListener('keydown',e=>{
 function usuarioDoPPR(u){
   const email=String(u.email||'').trim().toLowerCase();
   return { nome:String(u.nome||email).trim(), email,
-           papel: ADMINS_EMAILS.map(e=>e.toLowerCase()).includes(email) ? 'admin' : 'consulta' };
+           papel: (u.is_staff===true || ADMINS_EMAILS.map(e=>e.toLowerCase()).includes(email)) ? 'admin' : 'consulta' };
 }
 function semPPR(msg){
   document.body.innerHTML='<div style="max-width:520px;margin:15vh auto;padding:28px;background:#fff;border:1px solid #D9DCE6;'

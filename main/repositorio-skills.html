@@ -185,6 +185,7 @@ input[type=file]{display:none}
 .pt{background:#E5EFF7;color:#25597F}.pa{background:#FDF3E3;color:#B36E0C}.pc{background:#F5E5E5;color:#800000}
 .pb{background:#EAF0F8;color:#002060}.pp{background:#EEF2F8;color:#15497F}.pg{background:#F2F2F2;color:#6A6A6A}
 .pok{background:#E5F7EC;color:#00893F}
+.gi{width:1.1em;height:1.1em;flex:none;vertical-align:-.18em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.gi.f{fill:currentColor;stroke-width:1.5}.empty-icon .gi{width:36px;height:36px;stroke-width:1.4}a.btn-dl,a.btn-p{text-decoration:none}.pav{background:#F0EBF8;color:#5B3E8F}.pprod{background:#00893F;color:#fff}
 .rt{color:#B36E0C;font-weight:700;white-space:nowrap}
 .rt.vazio{color:var(--g-text3);font-weight:600}
 .aval{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--g-surface2);border:1px solid var(--g-border);
@@ -223,8 +224,9 @@ input[type=file]{display:none}
 .apv.ok{color:#00893F;border-color:rgba(0,176,80,.45);background:#E5F7EC}
 button.me-av{border:none;cursor:pointer;position:relative;font-family:inherit;transition:box-shadow .15s}
 button.me-av:hover{box-shadow:0 0 0 2px rgba(255,255,255,.6)}
-.me-av.edit::after{content:'✎';position:absolute;right:-4px;bottom:-4px;width:14px;height:14px;border-radius:50%;background:#fff;
+.me-av.edit::after{content:'';position:absolute;right:-4px;bottom:-4px;width:14px;height:14px;border-radius:50%;background:#fff;
   color:#002060;font-size:9px;line-height:14px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.me-av.edit::before{content:'';position:absolute;right:-1px;bottom:-1px;width:8px;height:8px;z-index:1;background:#002060;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/></svg>") center/contain no-repeat}
 .drop{border:1.5px dashed var(--g-border2);border-radius:4px;background:#FBFCFE;padding:13px 16px;display:flex;align-items:center;
   gap:12px;cursor:pointer;transition:all .15s;font-size:12.5px;color:var(--g-text2)}
 .drop:hover,.drop.over{border-color:var(--brand-blue);background:var(--blue-l)}
@@ -333,6 +335,24 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
 </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></symbol>
+<symbol id="i-ul" viewBox="0 0 24 24"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+<symbol id="i-ok" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-clip" viewBox="0 0 24 24"><path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></symbol>
+<symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/></symbol>
+<symbol id="i-hist" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
+<symbol id="i-ext" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3-4.6-4.4 6.3-.9z"/></symbol>
+<symbol id="i-pen" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></symbol>
+</svg>
 
 <!-- ═══════════════════ APP ═══════════════════ -->
 <div class="app" id="app">
@@ -401,7 +421,7 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
   <div class="mo">
     <div class="mo-hd">
       <div><h2 id="d-t"></h2><div class="mo-sub" id="d-s"></div></div>
-      <button class="mo-x" onclick="fechar('m-det')">✕</button>
+      <button class="mo-x" aria-label="Fechar" onclick="fechar('m-det')"><svg class="gi"><use href="#i-x"/></svg></button>
     </div>
     <div class="dtabs" id="d-tabs"></div>
     <div class="mo-bd" id="d-b"></div>
@@ -414,7 +434,7 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
   <div class="mo wide">
     <div class="mo-hd">
       <div><h2 id="f-t">Adicionar skill ao repositório</h2><div class="mo-sub" id="f-s"></div></div>
-      <button class="mo-x" onclick="fechar('m-form')">✕</button>
+      <button class="mo-x" aria-label="Fechar" onclick="fechar('m-form')"><svg class="gi"><use href="#i-x"/></svg></button>
     </div>
     <div class="mo-bd" id="f-bd">
       <div class="fnote" id="f-note"></div>
@@ -424,8 +444,8 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
         <div class="imp-t"><b>Preencher com o Claude:</b> baixe o template, anexe no Claude junto com o arquivo da skill e peça
           <i>"preencha este template com base na skill anexada"</i>. Depois importe o .md aqui — o formulário fica preenchido para você revisar.</div>
         <div class="imp-a">
-          <button type="button" class="btn-s" onclick="baixarTemplate()">⬇ Template para o Claude</button>
-          <button type="button" class="btn-p" onclick="document.getElementById('i-md').click()">⬆ Importar ficha (.md)</button>
+          <button type="button" class="btn-s" onclick="baixarTemplate()"><svg class="gi"><use href="#i-dl"/></svg> Template para o Claude</button>
+          <button type="button" class="btn-p" onclick="document.getElementById('i-md').click()"><svg class="gi"><use href="#i-ul"/></svg> Importar ficha (.md)</button>
         </div>
         <input type="file" id="i-md" accept=".md,.markdown,.txt,text/markdown,text/plain" onchange="importarMd(this.files[0])">
         <div class="imp-res" id="f-imp-res"></div>
@@ -443,7 +463,7 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
         <div class="frow" id="f-arq-drop"><div class="fi"><label id="lbl-arq"></label>
           <div class="drop" id="drop-arq" onclick="document.getElementById('i-arq').click()"
             ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="soltarArquivo(event)">
-            <span class="ic">📎</span><div id="drop-txt"></div></div>
+            <span class="ic"><svg class="gi"><use href="#i-clip"/></svg></span><div id="drop-txt"></div></div>
           <input type="file" id="i-arq" onchange="escolherArquivo(this.files[0])">
           <div class="hint" id="hint-arq"></div></div></div>
         <div class="frow" id="f-arq-repo"><div class="fi"><label>Link do repositório <span class="rq">*</span></label>
@@ -474,6 +494,8 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
           <option value="WIP">WIP — em desenvolvimento</option>
           <option value="MVP1">MVP1 — primeira versão utilizável</option>
           <option value="MVP2">MVP2 — segunda iteração</option>
+          <option value="Em avaliação">Em avaliação — em validação antes da produção</option>
+          <option value="Produção">Produção — liberada para uso em produção</option>
         </select></div>
         <div class="fi"><label>Amplitude</label><select id="i-amp">
           <option value="">Não classificada</option>
@@ -534,7 +556,7 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
   <div class="mo">
     <div class="mo-hd">
       <div><h2>Como funciona o repositório</h2><div class="mo-sub">Perfis, fluxo de aprovação e legendas</div></div>
-      <button class="mo-x" onclick="fechar('m-ajuda')">✕</button>
+      <button class="mo-x" aria-label="Fechar" onclick="fechar('m-ajuda')"><svg class="gi"><use href="#i-x"/></svg></button>
     </div>
     <div class="mo-bd">
       <div class="fsec">Os dois perfis</div>
@@ -552,8 +574,8 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
       <div class="fsec">Como cadastrar uma skill</div>
       <div class="fld-v" style="font-size:12.5px">
         <ul>
-          <li>Clique em <b>+ Adicionar skill</b>. Para ganhar tempo, use <b>⬇ Template para o Claude</b>: anexe o template no Claude junto com o
-            arquivo da skill e peça para preencher. Depois, <b>⬆ Importar ficha (.md)</b> — o formulário fica preenchido para você revisar.</li>
+          <li>Clique em <b>+ Adicionar skill</b>. Para ganhar tempo, use <b><svg class="gi"><use href="#i-dl"/></svg> Template para o Claude</b>: anexe o template no Claude junto com o
+            arquivo da skill e peça para preencher. Depois, <b><svg class="gi"><use href="#i-ul"/></svg> Importar ficha (.md)</b> — o formulário fica preenchido para você revisar.</li>
           <li>Anexe o arquivo da skill (ou o link do repositório, se for da internet) e clique em <b>Publicar skill</b>: ela aparece na hora em
             <b>Disponíveis</b> e você passa a ser o owner.</li>
           <li>Depois de publicada, qualquer mudança entra como <b>nova versão</b> — o template e a importação de .md funcionam também ali.</li>
@@ -585,13 +607,15 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
 
       <div class="fsec">Avaliação</div>
       <div class="fld-v" style="font-size:12.5px">Qualquer pessoa pode dar de <b>1 a 5 estrelas</b> a uma skill publicada, direto na ficha — a nota é salva no clique.
-        Vale uma nota por pessoa: avaliar de novo substitui a anterior. O card mostra a <b>média simples</b> e a quantidade de avaliações (ex.: <span class="rt">★ 4,3 · 12</span>).</div>
+        Vale uma nota por pessoa: avaliar de novo substitui a anterior. O card mostra a <b>média simples</b> e a quantidade de avaliações (ex.: <span class="rt"><svg class="gi f"><use href="#i-star"/></svg> 4,3 · 12</span>).</div>
 
       <div class="fsec">Estágio</div>
       <div class="frow c3">
         <div class="fi"><label><span class="pill pa">WIP</span></label><div class="fld-v" style="font-size:12px">Em construção. Ainda não liberada para uso amplo.</div></div>
         <div class="fi"><label><span class="pill pt">MVP1</span></label><div class="fld-v" style="font-size:12px">Primeira versão utilizável, já disponível.</div></div>
         <div class="fi"><label><span class="pill pok">MVP2</span></label><div class="fld-v" style="font-size:12px">Segunda iteração, escopo ampliado a partir do uso em projeto.</div></div>
+        <div class="fi"><label><span class="pill pav">Em avaliação</span></label><div class="fld-v" style="font-size:12px">Em validação pela Gestão Metodológica antes de ir para produção.</div></div>
+        <div class="fi"><label><span class="pill pprod">Produção</span></label><div class="fld-v" style="font-size:12px">Validada e liberada para uso em produção.</div></div>
       </div>
 
       <div class="fsec">Amplitude e impacto</div>
@@ -628,7 +652,7 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
   <div class="mo" style="max-width:430px">
     <div class="mo-hd">
       <div><h2>Suas iniciais</h2><div class="mo-sub">É assim que você aparece como Resp. nos cards</div></div>
-      <button class="mo-x" onclick="fechar('m-ini')">✕</button>
+      <button class="mo-x" aria-label="Fechar" onclick="fechar('m-ini')"><svg class="gi"><use href="#i-x"/></svg></button>
     </div>
     <div class="mo-bd">
       <div class="ferr" id="ini-err"></div>
@@ -673,7 +697,9 @@ const CATEGORIAS = [
   {id:'gestao',       nome:'Gestão de Projeto',          cor:'#00893F', bg:'#EBF6EF',
    desc:'Apoiam cronograma, coleta de informações e acompanhamento do projeto.'},
   {id:'sistemas',     nome:'Sistemas',                   cor:'#5C7EA8', bg:'#F1F4F9',
-   desc:'Ligadas aos sistemas Gradus Tech (Matrix, Arbor...) — protótipos e sugestões de melhoria.'}
+   desc:'Ligadas aos sistemas Gradus Tech (Matrix, Arbor...) — protótipos e sugestões de melhoria.'},
+  {id:'produtividade',nome:'Produtividade',              cor:'#8E4C9E', bg:'#F6EFF8',
+   desc:'Aceleram tarefas do dia a dia do consultor — e-mails, documentos, planilhas e organização.'}
 ];
 /* fallback: skills sem categoria ou com categoria que não existe mais na lista */
 const CAT_SEM = {id:'sem', nome:'Sem categoria', cor:'#7B8EA0', bg:'#F5F6F8',
@@ -965,12 +991,14 @@ const FONTE_LABEL = 'Repositório de Skills Gradus · base inicial GRA500 “Des
 const AMP_LBL = {1:'1 — Geral Gradus',2:'2 — Geral na metodologia',3:'3 — Análise'};
 const IMP_LBL = {1:'1 — Baixo',2:'2 — Médio',3:'3 — Alto',4:'4 — Muito alto'};
 const ORD_MET = ['OM','TO','MPC','PMI','Geral','Comercial'];
-const ORD_EST = ['WIP','MVP1','MVP2'];
+const ORD_EST = ['WIP','MVP1','MVP2','Em avaliação','Produção'];
 const OPC_TIPO = ['HTML','Skill','PPR','Python','StreamLit','HTML/Skill','Outro'];
 const EST_META = {
   'WIP' :{pill:'pa', cor:'#E68E18', cls:'wip', disp:'Em desenvolvimento', desc:'Em construção, ainda não liberada para uso amplo'},
   'MVP1':{pill:'pt', cor:'#306F9F', cls:'mvp1',disp:'Disponível',          desc:'Primeira versão utilizável, já disponível'},
   'MVP2':{pill:'pok',cor:'#00B050', cls:'mvp2',disp:'Disponível',          desc:'Segunda iteração, escopo ampliado'},
+  'Em avaliação':{pill:'pav', cor:'#6B4FA0', cls:'em-aval', disp:'Em avaliação', desc:'Em validação pela Gestão Metodológica antes de ir para produção'},
+  'Produção':{pill:'pprod', cor:'#00893F', cls:'prod', disp:'Disponível', desc:'Validada e liberada para uso em produção'},
   '—'   :{pill:'pg', cor:'#9DB1CF', cls:'',    disp:'Não informado',       desc:'Estágio não registrado'}
 };
 const TIPO_DESC = {
@@ -1103,7 +1131,7 @@ const DIMS = [
    ops:()=>{ const u=Array.from(new Set(ITENS.map(x=>x.m).filter(v=>v && v!=='—')));
              return ORD_MET.filter(m=>u.includes(m)).concat(u.filter(m=>!ORD_MET.includes(m))).map(m=>({v:m, t:m})); }},
   {k:'e', rot:'Estágio',     gen:'os', set:()=>F.ests,   val:x=>x.est,
-   ops:()=>[['WIP','Em desenvolvimento'],['MVP1','Primeira versão utilizável'],['MVP2','Segunda iteração']].map(([v,t])=>({v, t, b:v}))},
+   ops:()=>[['WIP','Em desenvolvimento'],['MVP1','Primeira versão utilizável'],['MVP2','Segunda iteração'],['Em avaliação','Em validação antes da produção'],['Produção','Liberada para uso em produção']].map(([v,t])=>({v, t, b:v}))},
   {k:'f', rot:'Fonte',       gen:'as', set:()=>F.fontes, val:x=>x.f,
    ops:()=>FONTES.map(o=>({v:o.id, t:o.nome, b:o.sigla}))}
 ];
@@ -1191,10 +1219,10 @@ function pintarBtnFiltros(){
 /* ── barra admin / ações globais ─────────────────────────────────────── */
 function montarAdmBar(){
   document.getElementById('adm-bar').innerHTML =
-    `<button class="btn-sm" onclick="baixarPacote()">⬇ Pacote .md dos filtrados</button>` + (isAdmin()
-    ? `<button class="btn-sm" onclick="expCadastros()">⬇ Exportar cadastros (.json)</button>
-       <button class="btn-sm" onclick="expCatalogo()">⬇ Catálogo (.csv)</button>
-       <label class="btn-sm" for="f-base" style="display:inline-flex;align-items:center">⬆ Atualizar base (lista corrida)</label>
+    `<button class="btn-sm" onclick="baixarPacote()"><svg class="gi"><use href="#i-dl"/></svg> Pacote .md dos filtrados</button>` + (isAdmin()
+    ? `<button class="btn-sm" onclick="expCadastros()"><svg class="gi"><use href="#i-dl"/></svg> Exportar cadastros (.json)</button>
+       <button class="btn-sm" onclick="expCatalogo()"><svg class="gi"><use href="#i-dl"/></svg> Catálogo (.csv)</button>
+       <label class="btn-sm" for="f-base" style="display:inline-flex;align-items:center"><svg class="gi"><use href="#i-ul"/></svg> Atualizar base (lista corrida)</label>
        <input type="file" id="f-base" accept=".csv,.xlsx,.xls" onchange="handleFile(this)">` : '');
 }
 
@@ -1212,11 +1240,11 @@ function irView(v){ VIEW=v; render(); window.scrollTo({top:0,behavior:'smooth'})
 function notaHTML(x){
   const M=EST_META[x.est], C=catDe(x.c), desc=x.esc||x.uso||x.out||x.ex||x.com||x.obs;
   const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
-  let acoes = `<button class="btn-dl" onclick="baixarMd(${x.id})">⬇ Baixar .md</button>
+  let acoes = `${linkExterno(x) ? btnAcessar(x,'btn-dl') : `<button class="btn-dl" onclick="baixarMd(${x.id})"><svg class="gi"><use href="#i-dl"/></svg> Baixar .md</button>`}
                <button class="btn-gh" onclick="abrirDet(${x.id})">Ver ficha</button>`;
   let flag='';
-  if(x.status==='pendente') flag=`<div class="pit-flag">⏳ <b>Aguardando aprovação</b> da Gestão Metodológica · sugerida por ${htm(pessoaTxt(x.criador))} em ${htm(x.criado)}${x.demo?' · <b>exemplo de demonstração</b>':''}</div>`;
-  if(x.status==='recusada') flag=`<div class="pit-flag" style="border-color:rgba(128,0,0,.28)">✕ <b style="color:#800000">Recusada</b>${x.motivo?' — '+htm(x.motivo):''}</div>`;
+  if(x.status==='pendente') flag=`<div class="pit-flag"><svg class="gi"><use href="#i-clock"/></svg> <b>Aguardando aprovação</b> da Gestão Metodológica · sugerida por ${htm(pessoaTxt(x.criador))} em ${htm(x.criado)}${x.demo?' · <b>exemplo de demonstração</b>':''}</div>`;
+  if(x.status==='recusada') flag=`<div class="pit-flag" style="border-color:rgba(128,0,0,.28)"><svg class="gi"><use href="#i-x"/></svg> <b style="color:#800000">Recusada</b>${x.motivo?' — '+htm(x.motivo):''}</div>`;
   return `<div class="pit" style="background:${C.bg}">
     <div class="fold"></div>
     <div class="pit-acc" style="background:${C.cor}"></div>
@@ -1241,12 +1269,12 @@ function render(){
   if(VIEW!=='disp'){ renderFila(f); return; }
   if(!f.length){
     body.innerHTML = tot
-      ? `<div class="empty"><div class="empty-icon">🔍</div>Nenhuma skill atende aos filtros atuais.<br><b>Limpe os filtros</b> para ver todas.</div>`
+      ? `<div class="empty"><div class="empty-icon"><svg class="gi"><use href="#i-search"/></svg></div>Nenhuma skill atende aos filtros atuais.<br><b>Limpe os filtros</b> para ver todas.</div>`
       : (VIEW==='pend'
-        ? `<div class="empty"><div class="empty-icon">${isAdmin()?'✅':'📝'}</div>${isAdmin()
+        ? `<div class="empty"><div class="empty-icon">${isAdmin()?'<svg class="gi"><use href="#i-done"/></svg>':'<svg class="gi"><use href="#i-doc"/></svg>'}</div>${isAdmin()
             ? 'Nenhuma sugestão na fila.<br><b>Tudo aprovado</b> — quando alguém cadastrar uma skill nova, ela aparece aqui.'
             : 'Você ainda não sugeriu nenhuma skill.<br>Clique em <b>+ Adicionar skill</b> para colocar a sua no repositório.'}</div>`
-        : `<div class="empty"><div class="empty-icon">📭</div>Nenhuma skill publicada ainda.</div>`);
+        : `<div class="empty"><div class="empty-icon"><svg class="gi"><use href="#i-inbox"/></svg></div>Nenhuma skill publicada ainda.</div>`);
     return;
   }
   if(!g){ body.innerHTML=`<div class="notes">${f.map(notaHTML).join('')}</div>`; return; }
@@ -1258,7 +1286,7 @@ function render(){
   else grupos.sort((a,b)=>f.filter(x=>key(x)===b).length-f.filter(x=>key(x)===a).length);
   body.innerHTML = grupos.map((gr,i)=>{
     const it=f.filter(x=>key(x)===gr);
-    const dl=it.filter(x=>x.est!=='WIP'&&x.est!=='—').length;
+    const dl=it.filter(x=>x.est!=='WIP'&&x.est!=='Em avaliação'&&x.est!=='—').length;
     return `<div class="grp-hd ${i===0?'first':''}"><h3>${htm(gr)}</h3>
       <span class="grp-n">${it.length} skill${it.length>1?'s':''}${VIEW==='disp'?` · ${dl} prontas para uso`:''}</span><i></i></div>
       <div class="notes">${it.map(notaHTML).join('')}</div>`;
@@ -1277,8 +1305,8 @@ function fmtNota(v){ return v==null ? '' : v.toFixed(1).replace('.',','); }
 function avalTexto(x){ const {n,media}=mediaAval(x);
   return n ? fmtNota(media)+' de 5 ('+n+' avaliaç'+(n>1?'ões':'ão')+')' : 'Sem avaliações'; }
 function avalCurta(x){ const {n,media}=mediaAval(x);
-  return n ? `<span class="rt" title="Média simples de ${n} avaliaç${n>1?'ões':'ão'}">★ ${fmtNota(media)} · ${n}</span>`
-           : `<span class="rt vazio" title="Ainda sem avaliações">☆ sem avaliações</span>`; }
+  return n ? `<span class="rt" title="Média simples de ${n} avaliaç${n>1?'ões':'ão'}"><svg class="gi f"><use href="#i-star"/></svg> ${fmtNota(media)} · ${n}</span>`
+           : `<span class="rt vazio" title="Ainda sem avaliações"><svg class="gi"><use href="#i-star"/></svg> sem avaliações</span>`; }
 function minhaNota(x){ return (x.avaliacoes||[]).find(v=>v.email===USUARIO.email) || null; }
 function avaliar(id,nota){
   const x=byId(id); if(!x || x.status!=='aprovada') return;
@@ -1304,7 +1332,7 @@ function pintarAvaliacao(x){
   if(!el || DET_ID!==x.id) return;
   const {n,media}=mediaAval(x);
   if(md) md.innerHTML = n
-    ? '<span class="rt">★ '+fmtNota(media)+'</span> <span style="font-weight:600;font-size:11.5px;color:var(--g-text3)">· '+n+' avaliaç'+(n>1?'ões':'ão')+'</span>'
+    ? '<span class="rt"><svg class="gi f"><use href="#i-star"/></svg> '+fmtNota(media)+'</span> <span style="font-weight:600;font-size:11.5px;color:var(--g-text3)">· '+n+' avaliaç'+(n>1?'ões':'ão')+'</span>'
     : '<span style="font-weight:600;color:var(--g-text3)">Sem avaliações</span>';
   if(x.status!=='aprovada'){
     el.innerHTML='<div class="aval"><span class="aval-msg">A avaliação abre quando a skill for aprovada e publicada.</span></div>'; return; }
@@ -1312,12 +1340,12 @@ function pintarAvaliacao(x){
   el.innerHTML = '<div class="aval"><div><div class="fld-l" style="margin-bottom:2px">Sua avaliação</div>'
     + '<div class="stars" role="radiogroup" aria-label="Avaliar de 1 a 5 estrelas">'
     + [1,2,3,4,5].map(k=>'<button type="button" class="'+(k<=v?'on':'')+'" role="radio" aria-checked="'+(k===v)+'" title="'+k+' — '+NOTA_LBL[k]
-        +'" onclick="avaliar('+x.id+','+k+')">★</button>').join('')
+        +'" onclick="avaliar('+x.id+','+k+')"><svg class="gi f"><use href="#i-star"/></svg></button>').join('')
     + '</div></div><span class="aval-msg">'
     + (minha ? 'Você deu <b>'+v+' — '+NOTA_LBL[v]+'</b> em '+htm(minha.data)+'. Clique em outra estrela para mudar.'
              : 'Clique em uma estrela para avaliar — a nota é salva na hora.')
     + '</span>'
-    + (minha ? '<button type="button" class="btn-rm-aval" onclick="removerAvaliacao('+x.id+')" title="Apaga a sua nota desta skill">✕ Excluir minha avaliação</button>' : '')
+    + (minha ? '<button type="button" class="btn-rm-aval" onclick="removerAvaliacao('+x.id+')" title="Apaga a sua nota desta skill"><svg class="gi"><use href="#i-x"/></svg> Excluir minha avaliação</button>' : '')
     + '</div>';
 }
 /* só para a demonstração: avaliações fictícias (emails @demo.local) para os cards não nascerem vazios */
@@ -1403,7 +1431,7 @@ function mdFor(x){
     L.push('## Situação reportada');
     L.push('A base de origem registra estágio **'+x.est+'** e situação **'+x.como+'**.');
     L.push('');
-    L.push('> ⚠️ Divergência entre os dois campos — confirmar com o responsável qual vale.');
+    L.push('> **Atenção:** divergência entre os dois campos — confirmar com o responsável qual vale.');
     L.push('');
   } else if(x.como){ L.push('## Situação reportada'); L.push('**'+x.como+'**'); L.push(''); }
   if(x.obs){ L.push('## Observações'); L.push(x.obs); L.push(''); }
@@ -1502,10 +1530,13 @@ function baixarArquivo(a){
 }
 function baixarArqVersao(id,v){ const x=byId(id), h=x && (x.historico||[]).find(e=>e.versao===v); baixarArquivo(h && h.arquivo); }
 function baixarArqNovo(id){ const x=byId(id); baixarArquivo(x && x.arquivoNovo); }
+/* skill externa com link: o botão principal leva à skill em vez de baixar a ficha */
+function linkExterno(x){ return x.f==='ext' && /^https?:\/\//i.test(x.repo||'') ? x.repo : ''; }
+function btnAcessar(x, cls){ return '<a class="'+cls+'" href="'+htm(linkExterno(x))+'" target="_blank" rel="noopener noreferrer"><svg class="gi"><use href="#i-ext"/></svg> Acessar Skill</a>'; }
 function linkSeguro(u){ return /^https?:\/\//i.test(u) ? '<a href="'+htm(u)+'" target="_blank" rel="noopener noreferrer">'+htm(u)+'</a>' : htm(u); }
 function baixarArqProposta(id){ const x=byId(id); baixarArquivo(x && x.proposta && x.proposta.arquivo); }
 function arqChip(a, onclick){
-  return a ? '<button type="button" class="arq" onclick="'+onclick+'" title="Baixar o arquivo">📎 '+htm(a.nome)+' <span class="hsub">'+fmtBytes(a.tamanho)+'</span></button>'
+  return a ? '<button type="button" class="arq" onclick="'+onclick+'" title="Baixar o arquivo"><svg class="gi"><use href="#i-clip"/></svg> '+htm(a.nome)+' <span class="hsub">'+fmtBytes(a.tamanho)+'</span></button>'
            : '<span class="hsub">sem arquivo</span>';
 }
 function arqDemo(nome, texto){   /* só para a demonstração */
@@ -1537,7 +1568,7 @@ function statusAprovHTML(x){
   const p=x.proposta;
   return p.exige.map(k=>{ const ok=p.aprov[k];
     return '<span class="apv '+(ok?'ok':'')+'" title="'+(ok?'Aprovado por '+htm(pessoaTxt(ok))+' em '+htm(ok.data):'Aguardando')+'">'
-      +(ok?'✓ ':'⏳ ')+htm(nomeAprov(x,k))+'</span>'; }).join(' ');
+      +(ok?'<svg class="gi"><use href="#i-ok"/></svg> ':'<svg class="gi"><use href="#i-clock"/></svg> ')+htm(nomeAprov(x,k))+'</span>'; }).join(' ');
 }
 
 function abrirNovaVersao(id){
@@ -1566,7 +1597,7 @@ function abrirNovaVersao(id){
     + (rascunho && p.motivo ? '<br><strong>Motivo da recusa anterior:</strong> '+htm(p.motivo) : '');
   document.getElementById('f-err').className='ferr';
   document.getElementById('f-f').innerHTML =
-    '<button class="btn-p" onclick="enviarVersao()">⬆ '+(req.length?'Enviar v'+prox+' para aprovação':'Publicar v'+prox)+'</button>'
+    '<button class="btn-p" onclick="enviarVersao()"><svg class="gi"><use href="#i-ul"/></svg> '+(req.length?'Enviar v'+prox+' para aprovação':'Publicar v'+prox)+'</button>'
     + '<button class="btn-s" onclick="fechar(\'m-form\')">Cancelar</button>'
     + '<span class="sp">skill_'+htm(x.slug)+'.md</span>';
   document.getElementById('m-det').classList.remove('show');
@@ -1661,10 +1692,10 @@ function renderFila(f){
   const novas=q.novas.filter(x=>f.includes(x)), versoes=q.versoes.filter(x=>f.includes(x));
   if(!novas.length && !versoes.length){
     body.innerHTML = (q.novas.length+q.versoes.length)
-      ? `<div class="empty"><div class="empty-icon">🔍</div>Nada atende aos filtros atuais.<br><b>Limpe os filtros</b> para ver tudo.</div>`
+      ? `<div class="empty"><div class="empty-icon"><svg class="gi"><use href="#i-search"/></svg></div>Nada atende aos filtros atuais.<br><b>Limpe os filtros</b> para ver tudo.</div>`
       : (VIEW==='pend'
-        ? `<div class="empty"><div class="empty-icon">✅</div>Nada aguardando a sua aprovação.<br>Quando alguém propuser uma versão de uma skill sua${isAdmin()?' (ou de uma skill ORG)':''}, ela aparece aqui.</div>`
-        : `<div class="empty"><div class="empty-icon">📝</div>Você ainda não propôs nenhuma versão.<br>Use <b>⬆ Subir nova versão</b> na ficha de uma skill para propor melhorias.</div>`);
+        ? `<div class="empty"><div class="empty-icon"><svg class="gi"><use href="#i-done"/></svg></div>Nada aguardando a sua aprovação.<br>Quando alguém propuser uma versão de uma skill sua${isAdmin()?' (ou de uma skill ORG)':''}, ela aparece aqui.</div>`
+        : `<div class="empty"><div class="empty-icon"><svg class="gi"><use href="#i-doc"/></svg></div>Você ainda não propôs nenhuma versão.<br>Use <b><svg class="gi"><use href="#i-ul"/></svg> Subir nova versão</b> na ficha de uma skill para propor melhorias.</div>`);
     return;
   }
   const sec=(tit,n,html,first)=>`<div class="grp-hd ${first?'first':''}"><h3>${tit}</h3><span class="grp-n">${n}</span><i></i></div><div class="notes">${html}</div>`;
@@ -1676,14 +1707,14 @@ function renderFila(f){
 function propostaCardHTML(x){
   const p=x.proposta, C=catDe(x.c), prox=x.versao+1, posso=papeisQuePosso(x).length>0, meu=p.autor.email===USUARIO.email;
   let acoes;
-  if(posso) acoes=`<button class="btn-gh ok" onclick="aprovarVersao(${x.id})">✓ Aprovar</button>
+  if(posso) acoes=`<button class="btn-gh ok" onclick="aprovarVersao(${x.id})"><svg class="gi"><use href="#i-ok"/></svg> Aprovar</button>
                    <button class="btn-gh no" onclick="abrirDet(${x.id},'proposta')">Revisar</button>`;
   else if(meu && p.status==='recusada') acoes=`<button class="btn-gh" onclick="abrirNovaVersao(${x.id})">Corrigir e reenviar</button>
                    <button class="btn-gh no" onclick="descartarProposta(${x.id})">Descartar</button>`;
   else acoes=`<button class="btn-gh" onclick="abrirDet(${x.id},'proposta')">Ver proposta</button>`;
   const flag = p.status==='recusada'
-    ? `<div class="pit-flag" style="border-color:rgba(128,0,0,.28)">✕ <b style="color:#800000">Recusada</b> por ${htm(pessoaTxt(p.recusadoPor))}${p.motivo?' — '+htm(p.motivo):''}</div>`
-    : `<div class="pit-flag">⏳ <b>Aguardando</b> ${statusAprovHTML(x)}${p.demo?' · <b>exemplo de demonstração</b>':''}</div>`;
+    ? `<div class="pit-flag" style="border-color:rgba(128,0,0,.28)"><svg class="gi"><use href="#i-x"/></svg> <b style="color:#800000">Recusada</b> por ${htm(pessoaTxt(p.recusadoPor))}${p.motivo?' — '+htm(p.motivo):''}</div>`
+    : `<div class="pit-flag"><svg class="gi"><use href="#i-clock"/></svg> <b>Aguardando</b> ${statusAprovHTML(x)}${p.demo?' · <b>exemplo de demonstração</b>':''}</div>`;
   return `<div class="pit" style="background:${C.bg}">
     <div class="fold"></div>
     <div class="pit-acc" style="background:${C.cor}"></div>
@@ -1774,7 +1805,7 @@ function fichaHTML(x){
   if(x.status==='recusada'&&x.motivo) extra += fld('Motivo da recusa','<b style="color:#800000">'+htm(x.motivo)+'</b>');
   if(x.como&&x.como!==x.est) extra += fld('Situação reportada na base de origem','<b>'+htm(x.como)+'</b> <span class="pill pc" style="margin-left:6px">divergente do estágio '+htm(x.est)+'</span>');
   const aviso = (p && p.status==='pendente')
-    ? '<div class="fnote" style="margin-bottom:16px">⏳ <b>v'+(x.versao+1)+' em análise</b> — proposta por <b>'+htm(pessoaTxt(p.autor))+'</b> em '+htm(p.data)
+    ? '<div class="fnote" style="margin-bottom:16px"><svg class="gi"><use href="#i-clock"/></svg> <b>v'+(x.versao+1)+' em análise</b> — proposta por <b>'+htm(pessoaTxt(p.autor))+'</b> em '+htm(p.data)
       + '. Aguardando: '+statusAprovHTML(x)+'. Até a aprovação, continua valendo a v'+x.versao+'.'
       + (verProposta(x) ? ' <a href="#" onclick="abaDet(\'proposta\');return false">Ver proposta</a>' : '') + '</div>'
     : '';
@@ -1816,16 +1847,16 @@ function fichaHTML(x){
 function fichaFooter(x){
   const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
   const emAnalise = !!(x.proposta && x.proposta.status==='pendente');
-  let ft = '<button class="btn-p" onclick="baixarMd('+x.id+')">⬇ Baixar ficha .md</button>'
+  let ft = (linkExterno(x) ? btnAcessar(x,'btn-p') : '<button class="btn-p" onclick="baixarMd('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar ficha .md</button>')
          + '<button class="btn-s" onclick="prevMd('+x.id+')" id="btn-prev">Ver conteúdo do .md</button>'
-         + (x.status==='aprovada' && !emAnalise ? '<button class="btn-s" onclick="abrirNovaVersao('+x.id+')">⬆ Subir nova versão</button>' : '')
+         + (x.status==='aprovada' && !emAnalise ? '<button class="btn-s" onclick="abrirNovaVersao('+x.id+')"><svg class="gi"><use href="#i-ul"/></svg> Subir nova versão</button>' : '')
          + (podeEditar?'<button class="btn-s" onclick="editar('+x.id+')">Editar ficha</button>':'');
   ft += '<span class="sp">skill_'+htm(x.slug)+'.md'+(x.versao?' · v'+x.versao:'')+'</span>';
   return ft;
 }
 function histHTML(x){
   const hs=(x.historico||[]).slice().sort((a,b)=>b.versao-a.versao);
-  if(!hs.length) return '<div class="empty" style="padding:40px 10px"><div class="empty-icon">🕘</div>Ainda sem versões publicadas.<br>'
+  if(!hs.length) return '<div class="empty" style="padding:40px 10px"><div class="empty-icon"><svg class="gi"><use href="#i-hist"/></svg></div>Ainda sem versões publicadas.<br>'
     + 'O histórico começa na <b>v1</b>, quando a skill for aprovada.</div>';
   return '<div class="fld-v" style="font-size:12px;margin-bottom:12px;color:var(--g-text2)">Cada versão aprovada fica registrada aqui. '
     + 'Baixar uma versão gera a ficha .md como ela estava naquela versão.</div>'
@@ -1838,14 +1869,14 @@ function histHTML(x){
           + '<td style="white-space:nowrap">'+htm(h.data)+'</td>'
           + '<td>'+htm(h.notas||'—')+'</td>'
           + '<td>'+(h.arquivo || !(h.snapshot&&h.snapshot.repo) ? arqChip(h.arquivo,'baixarArqVersao('+x.id+','+h.versao+')')
-                  : '<a href="'+htm(h.snapshot.repo)+'" target="_blank" rel="noopener noreferrer" class="arq">🔗 repositório</a>')+'</td>'
-          + '<td><button class="btn-gh" onclick="baixarVersao('+x.id+','+h.versao+')" title="Baixar a ficha da v'+h.versao+'">⬇ .md</button></td></tr>';
+                  : '<a href="'+htm(h.snapshot.repo)+'" target="_blank" rel="noopener noreferrer" class="arq"><svg class="gi"><use href="#i-link"/></svg> repositório</a>')+'</td>'
+          + '<td><button class="btn-gh" onclick="baixarVersao('+x.id+','+h.versao+')" title="Baixar a ficha da v'+h.versao+'"><svg class="gi"><use href="#i-dl"/></svg> .md</button></td></tr>';
       }).join('')
     + '</tbody></table></div>';
 }
 function histFooter(x){
   const n=(x.historico||[]).length;
-  return '<button class="btn-p" onclick="baixarMd('+x.id+')">⬇ Baixar versão atual'+(x.versao?' (v'+x.versao+')':'')+'</button>'
+  return '<button class="btn-p" onclick="baixarMd('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar versão atual'+(x.versao?' (v'+x.versao+')':'')+'</button>'
     + '<span class="sp">'+n+' vers'+(n===1?'ão':'ões')+'</span>';
 }
 function propTabHTML(x){
@@ -1879,7 +1910,7 @@ function propFooter(x){
   let ft='';
   if(posso.length){
     const faltaDepois=p.exige.filter(k=>!p.aprov[k] && !posso.includes(k));
-    ft += '<button class="btn-p go" onclick="aprovarVersao('+x.id+')">✓ '+(faltaDepois.length?'Aprovar':'Aprovar e publicar v'+prox)+'</button>'
+    ft += '<button class="btn-p go" onclick="aprovarVersao('+x.id+')"><svg class="gi"><use href="#i-ok"/></svg> '+(faltaDepois.length?'Aprovar':'Aprovar e publicar v'+prox)+'</button>'
         + '<button class="btn-s no" onclick="mostrarRejVersao('+x.id+')">Recusar</button>';
   }
   if(meu && p.status==='recusada')
@@ -1887,7 +1918,7 @@ function propFooter(x){
         + '<button class="btn-s no" onclick="descartarProposta('+x.id+')">Descartar proposta</button>';
   else if(meu && p.status==='pendente')
     ft += '<button class="btn-s no" onclick="descartarProposta('+x.id+')">Cancelar proposta</button>';
-  ft += '<button class="btn-s" onclick="baixarProposta('+x.id+')">⬇ .md da proposta</button>'
+  ft += '<button class="btn-s" onclick="baixarProposta('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> .md da proposta</button>'
       + '<span class="sp">v'+x.versao+' → v'+prox+'</span>';
   return ft;
 }
@@ -1931,7 +1962,7 @@ function abrirForm(){
     + 'e você passa a ser o owner (Resp.). Depois disso, mudanças entram como <b>nova versão</b>, com a sua aprovação.';
   document.getElementById('f-err').className='ferr';
   document.getElementById('f-f').innerHTML =
-    '<button class="btn-p go" onclick="salvar(\'aprovada\')">⬆ Publicar skill</button>'
+    '<button class="btn-p go" onclick="salvar(\'aprovada\')"><svg class="gi"><use href="#i-ul"/></svg> Publicar skill</button>'
     + '<button class="btn-s" onclick="fechar(\'m-form\')">Cancelar</button>';
   document.getElementById('m-form').classList.add('show');
   setTimeout(()=>document.getElementById('i-d').focus(),80);
@@ -2046,7 +2077,7 @@ function templateMd(x){
     'categoria: '+(x?catDe(x.c).nome:'')+'   # '+CATEGORIAS.map(c=>c.nome).join(' | '),
     'metodologia: '+v('m').replace('—','')+'   # '+ORD_MET.join(' | '),
     'formato: '+v('t')+'   # '+OPC_TIPO.join(' | '),
-    'estagio: '+(x && x.est!=='—' ? x.est : '')+'   # '+ORD_EST.join(' | ')+'  (WIP = em desenvolvimento, MVP1 = primeira versão utilizável)',
+    'estagio: '+(x && x.est!=='—' ? x.est : '')+'   # '+ORD_EST.join(' | ')+'  (WIP = em desenvolvimento, MVP1 = primeira versão utilizável, Produção = liberada para uso)',
     'fonte: '+(x?fonteDe(x.f).sigla:'')+'   # '+fontes+'  (CONS = feita por consultor, EXT = trazida da internet)',
     'amplitude: '+v('amp')+'   # 1 Geral Gradus | 2 Geral na metodologia | 3 Análise específica — em branco se não souber',
     'impacto_horas: '+v('hr')+'   # 1 a 4 — NÃO estimar: deixar em branco para o consultor',
@@ -2111,7 +2142,7 @@ function lerFichaMd(texto){
   if(cab.categoria){ const C=catDe(cab.categoria);
     if(C.id!=='sem' || slug(cab.categoria)==='sem-categoria') dados.c=C.id;
     else avisos.push('Categoria "'+cab.categoria+'" não está na lista — escolha no formulário.'); }
-  const daLista=(v,ops,rot,k)=>{ if(!v) return; const o=ops.find(x=>x.toLowerCase()===v.toLowerCase());
+  const daLista=(v,ops,rot,k)=>{ if(!v) return; const o=ops.find(x=>slug(x)===slug(v));
     if(o) dados[k]=o; else avisos.push(rot+' "'+v+'" não reconhecido — escolha no formulário.'); };
   daLista(cab.metodologia, ORD_MET, 'Metodologia', 'm');
   daLista(cab.formato, OPC_TIPO, 'Formato', 't');
@@ -2138,7 +2169,7 @@ async function importarMd(f){
   let texto; try{ texto=await f.text(); }catch(e){ toast('Não foi possível ler o arquivo.','err'); return; }
   const {dados, avisos}=lerFichaMd(texto);
   if(!Object.keys(dados).length){
-    mostrarImp('<span class="av">⚠ Nenhum campo reconhecido em <b>'+htm(f.name)+'</b>. Use o <b>Template para o Claude</b> como base.</span>'); return; }
+    mostrarImp('<span class="av"><svg class="gi"><use href="#i-warn"/></svg> Nenhum campo reconhecido em <b>'+htm(f.name)+'</b>. Use o <b>Template para o Claude</b> como base.</span>'); return; }
   /* consultor não marca ORG; numa nova versão de skill ORG, a fonte continua ORG */
   if(dados.f && !isAdmin()){
     const atual = VER_ID!==null ? byId(VER_ID).f : null;
@@ -2156,9 +2187,9 @@ async function importarMd(f){
   });
   pintarBlocoArquivo();
   const falta=[['amp','amplitude'],['hr','impacto em horas'],['q','impacto em qualidade']].filter(([k])=>dados[k]==null).map(([,l])=>l);
-  mostrarImp('<span class="ok">✓ '+n+' campo(s) preenchido(s) a partir de '+htm(f.name)+'</span> (em verde). Revise antes de publicar'
+  mostrarImp('<span class="ok"><svg class="gi"><use href="#i-ok"/></svg> '+n+' campo(s) preenchido(s) a partir de '+htm(f.name)+'</span> (em verde). Revise antes de publicar'
     + (falta.length ? ' e complete '+falta.join(', ')+' se souber' : '') + '.'
-    + (avisos.length ? '<br>'+avisos.map(a=>'<span class="av">⚠ '+htm(a)+'</span>').join('<br>') : ''));
+    + (avisos.length ? '<br>'+avisos.map(a=>'<span class="av"><svg class="gi"><use href="#i-warn"/></svg> '+htm(a)+'</span>').join('<br>') : ''));
   toast('Ficha importada: <b>'+n+'</b> campo(s) preenchido(s). Revise e anexe o arquivo da skill.','ok');
 }
 function mostrarImp(h){ const el=document.getElementById('f-imp-res'); el.innerHTML=h; el.className='imp-res show'; }

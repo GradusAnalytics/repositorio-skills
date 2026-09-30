@@ -113,6 +113,8 @@ button,input,select,textarea{font-family:inherit}
 .dd-op input{accent-color:var(--dk1);width:15px;height:15px;margin:0;cursor:pointer;flex-shrink:0}
 .dd-op .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .dd-t{flex:1;min-width:0}
+.dd-av{min-width:24px;height:22px;padding:0 5px;border-radius:11px;background:var(--dk1);color:#fff;font-size:9.5px;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:.2px}
 .dd-c{font-size:10.5px;font-weight:700;color:var(--g-text3);background:var(--g-surface2);border-radius:9px;padding:0 7px;min-width:22px;text-align:center}
 .dd-op.zero{color:var(--g-text3)}
 .dd-op.zero .dd-c{opacity:.55}
@@ -120,6 +122,9 @@ button,input,select,textarea{font-family:inherit}
   font-size:10.5px;color:var(--g-text3)}
 .dd-ft button{background:none;border:none;color:var(--accent3);font-size:11px;font-weight:700;cursor:pointer;padding:0}
 .dd-ft button:disabled{color:var(--g-text3);opacity:.5;cursor:default}
+.tl-view{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.ctl{display:inline-flex;align-items:center;gap:7px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g-text3)}
+.ctl .grp-sel{text-transform:none;letter-spacing:0}
 .tl3{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:13px;padding-top:12px;border-top:1px solid var(--g-border)}
 .seg{display:inline-flex;background:var(--g-bg);border:1px solid var(--g-border);border-radius:20px;padding:3px}
 .seg button{background:transparent;border:none;border-radius:16px;padding:5px 15px;font-size:12px;font-weight:700;
@@ -192,6 +197,7 @@ input[type=file]{display:none}
 .pok{background:#E5F7EC;color:#00893F}
 .gi{width:1.1em;height:1.1em;flex:none;vertical-align:-.18em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.gi.f{fill:currentColor;stroke-width:1.5}.empty-icon .gi{width:36px;height:36px;stroke-width:1.4}a.btn-dl,a.btn-p{text-decoration:none}.pav{background:#F0EBF8;color:#5B3E8F}.pprod{background:#00893F;color:#fff}
 .rt{color:#B36E0C;font-weight:700;white-space:nowrap}
+.dl-n{color:var(--g-text2);font-weight:700;white-space:nowrap}
 .rt.vazio{color:var(--g-text3);font-weight:600}
 .aval{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--g-surface2);border:1px solid var(--g-border);
   border-radius:3px;padding:10px 14px;margin:-2px 0 18px}
@@ -394,19 +400,32 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
       </div>
 
       <div class="tools-more" id="tools-more">
-      <div class="dd-row" id="dd-row"></div>
+      <!-- 1. filtros -->
+      <div class="dd-row"><div id="dd-row" style="display:contents"></div>
+        <button class="btn-clear" onclick="limpar()">Limpar filtros</button></div>
 
-      <div class="tl3">
+      <!-- 2. abas da tela + contagem -->
+      <div class="tl-view">
         <div class="seg" id="seg"></div>
         <span class="cnt" id="cnt"></span>
-        <button class="btn-clear" onclick="limpar()">Limpar filtros</button>
-        <select class="grp-sel" id="grp" onchange="render()" title="Agrupar os cards">
-          <option value="m">Agrupar por metodologia</option>
-          <option value="c">Agrupar por categoria</option>
-          <option value="est">Agrupar por estágio</option>
-          <option value="r">Agrupar por responsável</option>
-          <option value="">Sem agrupamento</option>
-        </select>
+      </div>
+
+      <!-- 3. (barra) agrupamento e ordenação -->
+      <div class="tl3">
+        <label class="ctl">Agrupar por
+          <select class="grp-sel" id="grp" onchange="render()">
+            <option value="m">Metodologia</option>
+            <option value="c">Categoria</option>
+            <option value="est">Estágio</option>
+            <option value="r">Responsável</option>
+            <option value="">Sem agrupamento</option>
+          </select></label>
+        <label class="ctl">Ordenar por
+          <select class="grp-sel" id="ord" onchange="render()">
+            <option value="alfa">Ordem alfabética (A–Z)</option>
+            <option value="nota">Nota (maior primeiro)</option>
+            <option value="down">Downloads (mais baixadas)</option>
+          </select></label>
         <div class="adm-bar" id="adm-bar"></div>
       </div>
       </div>
@@ -500,7 +519,6 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
           <option value="WIP">WIP — em desenvolvimento</option>
           <option value="MVP1">MVP1 — primeira versão utilizável</option>
           <option value="MVP2">MVP2 — segunda iteração</option>
-          <option value="Em avaliação">Em avaliação — em validação antes da produção</option>
           <option value="Produção">Produção — liberada para uso em produção</option>
         </select></div>
         <div class="fi"><label>Amplitude</label><select id="i-amp">
@@ -613,14 +631,14 @@ code{font-family:'Consolas',monospace;background:rgba(0,32,96,.08);padding:1px 5
 
       <div class="fsec">Avaliação</div>
       <div class="fld-v" style="font-size:12.5px">Qualquer pessoa pode dar de <b>1 a 5 estrelas</b> a uma skill publicada, direto na ficha — a nota é salva no clique.
-        Vale uma nota por pessoa: avaliar de novo substitui a anterior. O card mostra a <b>média simples</b> e a quantidade de avaliações (ex.: <span class="rt"><svg class="gi f"><use href="#i-star"/></svg> 4,3 · 12</span>).</div>
+        Vale uma nota por pessoa: avaliar de novo substitui a anterior. O card mostra a <b>média simples</b>, a quantidade de avaliações e <b>quantas pessoas baixaram</b> a skill — cada conta conta uma vez
+        (ex.: <span class="rt"><svg class="gi f"><use href="#i-star"/></svg> 4,3 · 12</span> · <span class="dl-n"><svg class="gi"><use href="#i-dl"/></svg> 57</span>).</div>
 
       <div class="fsec">Estágio</div>
-      <div class="frow c3">
+      <div class="frow c4">
         <div class="fi"><label><span class="pill pa">WIP</span></label><div class="fld-v" style="font-size:12px">Em construção. Ainda não liberada para uso amplo.</div></div>
         <div class="fi"><label><span class="pill pt">MVP1</span></label><div class="fld-v" style="font-size:12px">Primeira versão utilizável, já disponível.</div></div>
         <div class="fi"><label><span class="pill pok">MVP2</span></label><div class="fld-v" style="font-size:12px">Segunda iteração, escopo ampliado a partir do uso em projeto.</div></div>
-        <div class="fi"><label><span class="pill pav">Em avaliação</span></label><div class="fld-v" style="font-size:12px">Em validação pela Gestão Metodológica antes de ir para produção.</div></div>
         <div class="fi"><label><span class="pill pprod">Produção</span></label><div class="fld-v" style="font-size:12px">Validada e liberada para uso em produção.</div></div>
       </div>
 
@@ -1089,13 +1107,14 @@ const FONTE_LABEL = 'Repositório de Skills Gradus · base inicial GRA500 “Des
 const AMP_LBL = {1:'1 — Geral Gradus',2:'2 — Geral na metodologia',3:'3 — Análise'};
 const IMP_LBL = {1:'1 — Baixo',2:'2 — Médio',3:'3 — Alto',4:'4 — Muito alto'};
 const ORD_MET = ['OM','TO','MPC','PMI','Geral','Comercial'];
-const ORD_EST = ['WIP','MVP1','MVP2','Em avaliação','Produção'];
+const ORD_EST = ['WIP','MVP1','MVP2','Produção'];
+/* estágios que deixaram de existir: skills já gravadas com eles passam para o estágio indicado */
+const EST_LEGADO = {'Em avaliação':'MVP2'};
 const OPC_TIPO = ['HTML','Skill','PPR','Python','StreamLit','HTML/Skill','Outro'];
 const EST_META = {
   'WIP' :{pill:'pa', cor:'#E68E18', cls:'wip', disp:'Em desenvolvimento', desc:'Em construção, ainda não liberada para uso amplo'},
   'MVP1':{pill:'pt', cor:'#306F9F', cls:'mvp1',disp:'Disponível',          desc:'Primeira versão utilizável, já disponível'},
   'MVP2':{pill:'pok',cor:'#00B050', cls:'mvp2',disp:'Disponível',          desc:'Segunda iteração, escopo ampliado'},
-  'Em avaliação':{pill:'pav', cor:'#6B4FA0', cls:'em-aval', disp:'Em avaliação', desc:'Em validação pela Gestão Metodológica antes de ir para produção'},
   'Produção':{pill:'pprod', cor:'#00893F', cls:'prod', disp:'Disponível', desc:'Validada e liberada para uso em produção'},
   '—'   :{pill:'pg', cor:'#9DB1CF', cls:'',    disp:'Não informado',       desc:'Estágio não registrado'}
 };
@@ -1111,7 +1130,7 @@ const TIPO_DESC = {
 const NDOC = '_Não documentado — a preencher pelo responsável._';
 
 let ITENS = [], SEQ = 1, USUARIO = null, VIEW = 'disp', EDIT_ID = null, DET_ID = null, DET_ABA = 'ficha', VER_ID = null;
-const F = {cats:new Set(), mets:new Set(), ests:new Set(), fontes:new Set()};
+const F = {cats:new Set(), mets:new Set(), ests:new Set(), fontes:new Set(), resps:new Set()};
 
 /* ── utilidades ───────────────────────────────────────────────────────── */
 function htm(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -1145,10 +1164,16 @@ function iniciarHistorico(x, notas, autor, data){
 function donoPorIniciais(r){ const ini=txt(r)||'—', p=pessoaPorIniciais(ini); return {email:p?p.email:'', iniciais:ini}; }
 function respIni(x){ const o=x.owner||{}; return (o.email ? iniciaisDe(o.email, o.iniciais) : o.iniciais) || '—'; }
 
+/* aceita 'MVP1', 'mvp1', 'Produção', 'producao', 'prod' e os estágios antigos de EST_LEGADO; fora da lista vira '—' */
+function normEst(v){
+  const t=txt(v); if(!t) return '—';
+  const s=slug(t), leg=Object.keys(EST_LEGADO).find(k=>slug(k)===s); if(leg) return EST_LEGADO[leg];
+  return ORD_EST.find(e=>slug(e)===s) || (s==='prod'?'Produção':'—');
+}
 function mkItem(o, status, autor){
   const it = {
     id: SEQ++, c:catDe(o.c).id, f:fonteDe(o.f).id, m:txt(o.m)||'—', amp:num(o.amp), d:txt(o.d), t:txt(o.t)||'Outro', r:txt(o.r)||'—',
-    hr:num(o.hr), q:num(o.q), e:txt(o.e)||'—',
+    hr:num(o.hr), q:num(o.q), e:normEst(o.e),
     esc:txt(o.esc), ex:txt(o.ex), com:txt(o.com), como:txt(o.como), obs:txt(o.obs),
     inp:txt(o.inp), out:txt(o.out), uso:txt(o.uso), link:txt(o.link), repo:txt(o.repo),
     status: status||'aprovada', autor: autor||txt(o.r)||'—', autorEmail: o.autorEmail||'',
@@ -1167,6 +1192,7 @@ function derivar(it){
   it.catL = catDe(it.c).nome;
   it.f    = fonteDe(it.f).id;
   it.fonteL = fonteDe(it.f).nome;
+  if(EST_LEGADO[it.e]) it.e = EST_LEGADO[it.e];   /* migra estágio antigo (a gravação no PPR acontece no próximo render) */
   it.est  = EST_META[it.e] ? it.e : '—';
   it.disp = EST_META[it.est].disp;
   it.ampL = it.amp && AMP_LBL[it.amp] ? AMP_LBL[it.amp] : 'Não informada';
@@ -1186,6 +1212,7 @@ function semear(){
     ITENS.push(it);
   });
   if(DEMO_AVALIACOES) semearAvaliacoesDemo();
+  if(DEMO_DOWNLOADS) semearDownloadsDemo();
   if(DEMO_VERSOES) semearVersoesDemo();
 }
 
@@ -1229,10 +1256,18 @@ const DIMS = [
    ops:()=>{ const u=Array.from(new Set(ITENS.map(x=>x.m).filter(v=>v && v!=='—')));
              return ORD_MET.filter(m=>u.includes(m)).concat(u.filter(m=>!ORD_MET.includes(m))).map(m=>({v:m, t:m})); }},
   {k:'e', rot:'Estágio',     gen:'os', set:()=>F.ests,   val:x=>x.est,
-   ops:()=>[['WIP','Em desenvolvimento'],['MVP1','Primeira versão utilizável'],['MVP2','Segunda iteração'],['Em avaliação','Em validação antes da produção'],['Produção','Liberada para uso em produção']].map(([v,t])=>({v, t, b:v}))},
+   todas:true,   /* os 4 estágios aparecem sempre, mesmo sem skill */
+   ops:()=>[['WIP','Em desenvolvimento'],['MVP1','Primeira versão utilizável'],['MVP2','Segunda iteração'],['Produção','Liberada para uso em produção']].map(([v,t])=>({v, t, b:v}))},
   {k:'f', rot:'Fonte',       gen:'as', set:()=>F.fontes, val:x=>x.f,
-   ops:()=>FONTES.map(o=>({v:o.id, t:o.nome, b:o.sigla}))}
+   ops:()=>FONTES.map(o=>({v:o.id, t:o.nome, b:o.sigla}))},
+  {k:'r', rot:'Consultor',   gen:'os', set:()=>F.resps,  val:x=>chaveOwner(x),
+   ops:()=>{ const m=new Map();
+     ITENS.forEach(x=>{ const k=chaveOwner(x); if(m.has(k)) return;
+       m.set(k,{v:k, b:x.r, t:x.owner && x.owner.email ? loginDoEmail(x.owner.email) : (x.r==='—'?'sem responsável definido':'sem email vinculado')}); });
+     return [...m.values()].sort((a,b)=>((a.b==='—')-(b.b==='—')) || a.b.localeCompare(b.b,'pt-BR')); }}   /* por iniciais; sem responsável por último */
 ];
+/* o owner é identificado pelo email; sem email vinculado (base antiga), pelas iniciais */
+function chaveOwner(x){ return x.owner && x.owner.email ? x.owner.email : 'ini:'+x.r; }
 let DD_ABERTO = null;   /* dimensão com o painel aberto */
 function passa(x, exceto){
   const q=(document.getElementById('q').value||'').trim().toLowerCase();
@@ -1242,11 +1277,12 @@ function marcaOp(d,o){
   if(d.k==='c') return `<span class="dot" style="background:${o.cor}"></span>`;
   if(d.k==='e') return `<span class="pill ${EST_META[o.v].pill}">${o.v}</span>`;
   if(d.k==='f') return fontePill(o.v);
+  if(d.k==='r') return `<span class="dd-av">${htm(o.b)}</span>`;
   return '';
 }
 function ddHTML(d){
   const set=d.set(), base=visiveis(), aberto=DD_ABERTO===d.k;
-  const ops=d.ops().filter(o=>ITENS.some(x=>d.val(x)===o.v));
+  const ops=d.ops().filter(o=>d.todas || ITENS.some(x=>d.val(x)===o.v));
   const sel=ops.filter(o=>set.has(o.v));
   const valor = !sel.length ? '' : sel.length===1 ? (sel[0].b||sel[0].t) : sel.length+' selecionad'+d.gen;
   return `<div class="dd ${sel.length?'on':''} ${aberto?'open':''}">
@@ -1273,7 +1309,7 @@ function marcarDD(k,v,on){ const st=dim(k).set(); on ? st.add(v) : st.delete(v);
 function limparDD(k){ dim(k).set().clear(); render(); }
 document.addEventListener('click', e=>{ if(DD_ABERTO && !e.target.closest('.dd')) fecharDD(); });
 function limpar(silent){
-  F.cats.clear(); F.mets.clear(); F.ests.clear(); F.fontes.clear();
+  F.cats.clear(); F.mets.clear(); F.ests.clear(); F.fontes.clear(); F.resps.clear();
   const q=document.getElementById('q'); if(q) q.value='';
   if(!silent){ montarChips(); render(); }
 }
@@ -1305,7 +1341,7 @@ function alternarFiltros(){
 }
 function pintarBtnFiltros(){
   document.querySelector('.tools').classList.toggle('min', FILTROS_MIN);
-  const n = F.cats.size + F.mets.size + F.ests.size + F.fontes.size;
+  const n = F.cats.size + F.mets.size + F.ests.size + F.fontes.size + F.resps.size;
   document.getElementById('btn-flt').innerHTML = FILTROS_MIN
     ? `<span class="arr">▾</span> Filtros${n?` <span class="bdg" title="${n} filtro(s) ativo(s)">${n}</span>`:''}`
     : `<span class="arr">▾</span> Recolher filtros`;
@@ -1317,7 +1353,7 @@ function pintarBtnFiltros(){
 /* ── barra admin / ações globais ─────────────────────────────────────── */
 function montarAdmBar(){
   document.getElementById('adm-bar').innerHTML =
-    `<button class="btn-sm" onclick="baixarPacote()"><svg class="gi"><use href="#i-dl"/></svg> Pacote .md dos filtrados</button>` + (isAdmin()
+    `<button class="btn-sm" onclick="baixarFichasFiltradas()"><svg class="gi"><use href="#i-dl"/></svg> Pacote .md dos filtrados</button>` + (isAdmin()
     ? `<button class="btn-sm" onclick="expCadastros()"><svg class="gi"><use href="#i-dl"/></svg> Exportar cadastros (.json)</button>
        <button class="btn-sm" onclick="expCatalogo()"><svg class="gi"><use href="#i-dl"/></svg> Catálogo (.csv)</button>
        <label class="btn-sm" for="f-base" style="display:inline-flex;align-items:center"><svg class="gi"><use href="#i-ul"/></svg> Atualizar base (lista corrida)</label>
@@ -1352,15 +1388,23 @@ function notaHTML(x){
       <span class="pill ${M.pill}">${htm(x.est)}</span>
     </div>
     <h4>${htm(x.d)}</h4>
-    <div class="pit-meta"><b>${htm(x.m)}</b><em>·</em>Resp. <b>${htm(x.r)}</b><em>·</em>${htm(M.disp)}${x.status==='aprovada'?'<em>·</em>'+avalCurta(x):''}</div>
+    <div class="pit-meta"><b>${htm(x.m)}</b><em>·</em>Resp. <b>${htm(x.r)}</b>${x.status==='aprovada'?'<em>·</em>'+avalCurta(x)+'<em>·</em>'+downCurta(x):''}</div>
     <div class="pit-d ${desc?'':'pend'}">${desc?htm(desc):'Ficha ainda sem descrição — abra e complete para o pessoal saber quando usar.'}</div>
     ${flag}
     <div class="pit-ft">${acoes}<span class="pit-doc ${x.doc}" title="Documentação ${htm(x.docL)}"><i></i>${htm(x.docL)}</span></div>
   </div>`;
 }
+/* ordenação: vale dentro de cada grupo — a ordem dos grupos não muda. Empate: ordem alfabética. */
+const ORDENS = {
+  alfa: (a,b)=>a.d.localeCompare(b.d,'pt-BR',{sensitivity:'base'}),
+  nota: (a,b)=>{ const A=mediaAval(a), B=mediaAval(b);   /* sem avaliação vai para o fim */
+    return ((B.media==null?-1:B.media)-(A.media==null?-1:A.media)) || (B.n-A.n) || ORDENS.alfa(a,b); },
+  down: (a,b)=>(downloadsDe(b)-downloadsDe(a)) || ORDENS.alfa(a,b)
+};
+function ordenar(lista){ return lista.slice().sort(ORDENS[document.getElementById('ord').value] || ORDENS.alfa); }
 function render(){
   montarSeg(); montarChips();
-  const f=filtrados(), g=document.getElementById('grp').value, body=document.getElementById('body');
+  const f=ordenar(filtrados()), g=document.getElementById('grp').value, body=document.getElementById('body');
   const tot=visiveis().length;
   document.getElementById('cnt').innerHTML = `<b>${f.length}</b> de ${tot} ${VIEW==='disp'?'skills disponíveis':(VIEW==='pend'?'aguardando sua aprovação':'sugestões suas')}`;
   pintarBtnFiltros();
@@ -1384,7 +1428,7 @@ function render(){
   else grupos.sort((a,b)=>f.filter(x=>key(x)===b).length-f.filter(x=>key(x)===a).length);
   body.innerHTML = grupos.map((gr,i)=>{
     const it=f.filter(x=>key(x)===gr);
-    const dl=it.filter(x=>x.est!=='WIP'&&x.est!=='Em avaliação'&&x.est!=='—').length;
+    const dl=it.filter(x=>x.est!=='WIP'&&x.est!=='—').length;
     return `<div class="grp-hd ${i===0?'first':''}"><h3>${htm(gr)}</h3>
       <span class="grp-n">${it.length} skill${it.length>1?'s':''}${VIEW==='disp'?` · ${dl} prontas para uso`:''}</span><i></i></div>
       <div class="notes">${it.map(notaHTML).join('')}</div>`;
@@ -1477,6 +1521,7 @@ function mdFor(x){
   L.push('  impacto_horas: "'+x.hrL+'"');
   L.push('  impacto_qualidade: "'+x.qL+'"');
   L.push('  avaliacao: "'+avalTexto(x)+'"');
+  L.push('  downloads: '+downloadsDe(x));
   L.push('  documentacao: '+x.docL);
   L.push('  publicacao: '+({aprovada:'Aprovada e publicada',pendente:'Aguardando aprovação',recusada:'Recusada'}[x.status]));
   L.push('  versao: '+(x.versao?'v'+x.versao:'não publicada')+(x._proposta?' (proposta em análise, ainda não aprovada)':''));
@@ -1563,12 +1608,61 @@ function baixa(nome, conteudo, mime){
   a.href=url; a.download=nome; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
+/* ── downloads: únicos por conta ──
+   Cada pessoa (email) conta 1 vez por skill — em qualquer versão, somando .zip, ficha .md, arquivo e "Acessar Skill" (EXT).
+   Não contam: fichas .md em lote, downloads de quem revisa uma proposta e o template para o Claude.
+   No PPR cada pessoa grava só o próprio registro na coleção meu_downloads (chave = email, dados = {skills:[ids]}),
+   no mesmo padrão de meu_pessoas: ninguém disputa o registro da skill e a contagem não gera conflito de gravação. */
+let DL = {};          /* email -> Set(ids das skills que a pessoa baixou) */
+let DL_CONT = {};     /* id -> nº de pessoas (cache de DL) */
+let DL_VERSAO = 0;    /* versão do meu registro em meu_downloads */
+const DEMO_DOWNLOADS = MODO_DEMO;   /* downloads fictícios só no modo demonstração */
+function recontarDownloads(){ DL_CONT={}; Object.values(DL).forEach(st=>st.forEach(id=>{ DL_CONT[id]=(DL_CONT[id]||0)+1; })); }
+function downloadsDe(x){ return DL_CONT[String(x.id)]||0; }
+function downCurta(x){ const n=downloadsDe(x);
+  return `<span class="dl-n" title="${n} pessoa${n===1?' baixou':'s baixaram'} esta skill"><svg class="gi"><use href="#i-dl"/></svg> ${n}</span>`; }
+function registrarDownload(x){
+  if(!x || !USUARIO || !USUARIO.email) return;
+  const id=String(x.id), meus=DL[USUARIO.email] || (DL[USUARIO.email]=new Set());
+  if(meus.has(id)) return;                          /* essa pessoa já contou para esta skill */
+  meus.add(id); DL_CONT[id]=(DL_CONT[id]||0)+1;
+  /* depois do clique: redesenhar na hora cancelaria a navegação do link "Acessar Skill" */
+  setTimeout(()=>{ render(); const el=document.getElementById('d-down'); if(el && DET_ID===x.id) el.innerHTML=downCurta(x); }, 0);
+  if(DADOS_ON) gravarMeusDownloads().catch(e=>console.warn('Downloads não gravados no PPR:', e));
+}
+async function carregarDownloads(){
+  const r=await pprData('ppr.data.list', {colecao:'meu_downloads'});
+  if(r.status!==200) throw new Error(r.erro||('erro '+r.status));
+  const eu=String((window.GRADUS_USUARIO||{}).email||'').toLowerCase();
+  DL={}; DL_VERSAO=0;
+  (r.registros||[]).forEach(g=>{
+    DL[g.chave]=new Set(((g.dados&&g.dados.skills)||[]).map(String));
+    if(g.chave===eu) DL_VERSAO=g.versao;
+  });
+  recontarDownloads();
+}
+async function gravarMeusDownloads(repetindo){
+  const email=USUARIO.email, skills=[...(DL[email]||[])];
+  const r=await pprData('ppr.data.save', {colecao:'meu_downloads', chave:email, dados:{skills}, versao:DL_VERSAO});
+  if(r.status===200 || r.status===201){ DL_VERSAO=r.registro.versao; return; }
+  if(r.status===409 && !repetindo){   /* a mesma pessoa em outra aba: junta as duas listas e grava de novo */
+    const locais=new Set(skills); await carregarDownloads();
+    const st=DL[email] || (DL[email]=new Set()); locais.forEach(id=>st.add(id)); recontarDownloads();
+    return gravarMeusDownloads(true);
+  }
+  throw new Error(r.erro||('erro '+r.status));
+}
+function semearDownloadsDemo(){   /* só para a demonstração: pessoas fictícias, fixas entre recargas */
+  ITENS.forEach(x=>{ let h=11; for(const ch of x.slug) h=(h*33+ch.charCodeAt(0))>>>0;
+    for(let i=1;i<=h%90;i++){ const e='leitor'+i+'@demo.local'; (DL[e]||(DL[e]=new Set())).add(String(x.id)); } });
+  recontarDownloads();
+}
 function baixarMd(id){
   const x=byId(id); if(!x) return;
-  baixa('skill_'+x.slug+'.md', mdFor(x));
+  baixa('skill_'+x.slug+'.md', mdFor(x)); registrarDownload(x);
   toast('Ficha <b>skill_'+htm(x.slug)+'.md</b> baixada.','ok');
 }
-function baixarPacote(){
+function baixarFichasFiltradas(){   /* lote de fichas .md: não conta como download */
   const f=filtrados();
   if(!f.length){ toast('Nenhuma skill nos filtros atuais.','err'); return; }
   const L=['# Repositório de Skills — Gradus Consultoria','', 'Fonte: '+FONTE_LABEL,'',
@@ -1626,7 +1720,8 @@ function baixarArquivo(a){
   el.href=url; el.download=a.nome; document.body.appendChild(el); el.click(); el.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
-function baixarArqVersao(id,v){ const x=byId(id), h=x && (x.historico||[]).find(e=>e.versao===v); baixarArquivo(h && h.arquivo); }
+function baixarArqVersao(id,v){ const x=byId(id), h=x && (x.historico||[]).find(e=>e.versao===v);
+  if(h && h.arquivo && (h.arquivo.blob || h.arquivo.dataUrl)) registrarDownload(x); baixarArquivo(h && h.arquivo); }
 function baixarArqNovo(id){ const x=byId(id); baixarArquivo(x && x.arquivoNovo); }
 /* skill externa com link: o botão principal leva à skill em vez de baixar a ficha */
 function linkExterno(x){ return x.f==='ext' && /^https?:\/\//i.test(x.repo||'') ? x.repo : ''; }
@@ -1640,10 +1735,11 @@ async function baixarPacote(id, versao){
     if(r.status!==200 || !r.blob) throw new Error(r.erro||('erro '+r.status));
     const url=URL.createObjectURL(r.blob), el=document.createElement('a');
     el.href=url; el.download=r.nome||'skill.zip'; document.body.appendChild(el); el.click(); el.remove();
+    registrarDownload(byId(id));
     setTimeout(()=>URL.revokeObjectURL(url),1500);
   }catch(e){ toast('Não foi possível baixar o pacote ('+htm(e.message)+').','err'); }
 }
-function btnAcessar(x, cls){ return '<a class="'+cls+'" href="'+htm(linkExterno(x))+'" target="_blank" rel="noopener noreferrer"><svg class="gi"><use href="#i-ext"/></svg> Acessar Skill</a>'; }
+function btnAcessar(x, cls){ return '<a class="'+cls+'" href="'+htm(linkExterno(x))+'" target="_blank" rel="noopener noreferrer" onclick="registrarDownload(byId('+x.id+'))"><svg class="gi"><use href="#i-ext"/></svg> Acessar Skill</a>'; }
 function linkSeguro(u){ return /^https?:\/\//i.test(u) ? '<a href="'+htm(u)+'" target="_blank" rel="noopener noreferrer">'+htm(u)+'</a>' : htm(u); }
 function baixarArqProposta(id){ const x=byId(id); baixarArquivo(x && x.proposta && x.proposta.arquivo); }
 function arqChip(a, onclick){
@@ -1787,7 +1883,7 @@ function baixarVersao(id,v){
   const h=(x.historico||[]).find(e=>e.versao===v); if(!h) return;
   const tmp=derivar(Object.assign({}, x, h.snapshot, {versao:h.versao, owner:Object.assign({},h.autor),
                                   ultMod:Object.assign({},h.autor,{data:h.data}), proposta:null}));
-  baixa('skill_'+tmp.slug+'_v'+v+'.md', mdFor(tmp));
+  baixa('skill_'+tmp.slug+'_v'+v+'.md', mdFor(tmp)); registrarDownload(x);
   toast('Ficha da <b>v'+v+'</b> de <b>'+htm(x.d)+'</b> baixada.','ok');
 }
 function baixarProposta(id){
@@ -1800,7 +1896,7 @@ function baixarProposta(id){
 /* cards das filas (Pendentes de aprovação / Minhas sugestões) */
 function renderFila(f){
   const body=document.getElementById('body'), q=fila();
-  const novas=q.novas.filter(x=>f.includes(x)), versoes=q.versoes.filter(x=>f.includes(x));
+  const novas=f.filter(x=>q.novas.includes(x)), versoes=f.filter(x=>q.versoes.includes(x));   /* mantém a ordenação */
   if(!novas.length && !versoes.length){
     body.innerHTML = (q.novas.length+q.versoes.length)
       ? `<div class="empty"><div class="empty-icon"><svg class="gi"><use href="#i-search"/></svg></div>Nada atende aos filtros atuais.<br><b>Limpe os filtros</b> para ver tudo.</div>`
@@ -1932,6 +2028,7 @@ function fichaHTML(x){
     + '<div class="mg-i"><div class="fld-l">Impacto · qualidade</div><div class="fld-v">'+htm(x.qL)+'</div></div>'
     + '<div class="mg-i"><div class="fld-l">Documentação</div><div class="fld-v">'+htm(x.docL)+'</div></div>'
     + '<div class="mg-i"><div class="fld-l">Avaliação</div><div class="fld-v" id="d-aval-media"></div></div>'
+    + '<div class="mg-i"><div class="fld-l">Downloads</div><div class="fld-v" id="d-down">'+downCurta(x)+'</div></div>'
     + '</div>'
     + '<div id="d-aval"></div>'
     + fld('O que ela entrega', htm(x.esc))
@@ -2238,7 +2335,7 @@ function templateMd(x){
     'categoria: '+(x?catDe(x.c).nome:'')+'   # '+CATEGORIAS.map(c=>c.nome).join(' | '),
     'metodologia: '+v('m').replace('—','')+'   # '+ORD_MET.join(' | '),
     'formato: '+v('t')+'   # '+OPC_TIPO.join(' | '),
-    'estagio: '+(x && x.est!=='—' ? x.est : '')+'   # '+ORD_EST.join(' | ')+'  (WIP = em desenvolvimento, MVP1 = primeira versão utilizável, Produção = liberada para uso)',
+    'estagio: '+(x && x.est!=='—' ? x.est : '')+'   # '+ORD_EST.join(' | ')+'  (WIP = em desenvolvimento, MVP1 = primeira versão utilizável, MVP2 = segunda iteração, Produção = liberada para uso)',
     'fonte: '+(x?fonteDe(x.f).sigla:'')+'   # '+fontes+'  (CONS = feita por consultor, EXT = trazida da internet)',
     'amplitude: '+v('amp')+'   # 1 Geral Gradus | 2 Geral na metodologia | 3 Análise específica — em branco se não souber',
     'impacto_horas: '+v('hr')+'   # 1 a 4 — NÃO estimar: deixar em branco para o consultor',
@@ -2360,7 +2457,7 @@ function limparImportacao(){ const el=document.getElementById('f-imp-res'); el.i
 function expCadastros(){
   const novas=ITENS.filter(x=>x.origem!=='base');
   if(!novas.length){ toast('Nenhum cadastro novo nesta sessão.','err'); return; }
-  const lim=novas.map(x=>({fonte:x.f,avaliacao_media:mediaAval(x).media,avaliacoes:x.avaliacoes.filter(a=>!a.demo),categoria:x.c,categoria_nome:x.catL,metodologia:x.m,amplitude:x.amp,nome:x.d,formato:x.t,responsavel:x.r,impacto_horas:x.hr,
+  const lim=novas.map(x=>({fonte:x.f,avaliacao_media:mediaAval(x).media,downloads:downloadsDe(x),avaliacoes:x.avaliacoes.filter(a=>!a.demo),categoria:x.c,categoria_nome:x.catL,metodologia:x.m,amplitude:x.amp,nome:x.d,formato:x.t,responsavel:x.r,impacto_horas:x.hr,
     impacto_qualidade:x.q,estagio:x.est,escopo:x.esc,inputs:x.inp,output:x.out,como_usar:x.uso,exemplos:x.ex,
     backlog:x.com,onde_encontrar:x.link,repositorio:x.repo,observacoes:x.obs,status:x.status,motivo_recusa:x.motivo,
     cadastrado_por:pessoaTxt(x.criador),cadastrado_por_email:x.criador.email,owner_email:x.owner.email,versao:x.versao,historico:x.historico.map(h=>({versao:h.versao,data:h.data,autor_email:h.autor.email,autor_iniciais:h.autor.iniciais,notas:h.notas,arquivo:h.arquivo?{nome:h.arquivo.nome,tamanho:h.arquivo.tamanho}:null})),cadastrado_em:x.criado,arquivo_md:'skill_'+x.slug+'.md'}));
@@ -2373,7 +2470,7 @@ function expCatalogo(){
   const rows=f.map(x=>({'Fonte':fonteDe(x.f).sigla,'Categoria':x.catL,'Metodologia':x.m,'Amplitude':x.amp||'','Nome':x.d,'Formato':x.t,'Resp':x.r,'Versão':x.versao?'v'+x.versao:'','Horas':x.hr||'',
     'Qualid':x.q||'','Estágio':x.est,'Disponibilidade':x.disp,'Escopo':x.esc,'Inputs':x.inp,'Output':x.out,
     'Como usar':x.uso,'Exemplos':x.ex,'Backlog':x.com,'Onde encontrar':x.link,'Repositório':x.repo,'Obs':x.obs,
-    'Documentação':x.docL,'Avaliação média':fmtNota(mediaAval(x).media),'Nº avaliações':mediaAval(x).n,'Publicação':x.status,'Arquivo .md':'skill_'+x.slug+'.md'}));
+    'Documentação':x.docL,'Avaliação média':fmtNota(mediaAval(x).media),'Nº avaliações':mediaAval(x).n,'Downloads':downloadsDe(x),'Publicação':x.status,'Arquivo .md':'skill_'+x.slug+'.md'}));
   baixa('catalogo_skills_'+f.length+'.csv', Papa.unparse(rows), 'text/csv');
   toast('Catálogo com <b>'+f.length+'</b> skill(s) exportado.','ok');
 }
@@ -2418,6 +2515,7 @@ function handleFile(input){
         if(!txt(o.c)) o.c=a.c; if(!txt(o.f)) o.f=a.f; o.avaliacoes=a.avaliacoes; });
       SEQ=1; ITENS=lidas.map(o=>{
         const it=mkItem(o,'aprovada'), a=antes[it.slug];
+        it.id = a ? a.id : novoId();   /* id estável: downloads e registro no PPR continuam valendo */
         if(a){   /* mesma skill: histórico, criador e proposta em análise seguem com ela */
           it.versao=a.versao; it.historico=a.historico; it.criador=a.criador; it.ultMod=a.ultMod; it.proposta=a.proposta;
           if(!txt(o.r) || normIni(o.r)===normIni(a.r)) it.owner=a.owner;
@@ -2572,6 +2670,7 @@ async function iniciarNoPPR(){
     erro=e; DADOS_ON=false;
     if(!ITENS.length) semear();
   }
+  if(DADOS_ON){ try{ await carregarDownloads(); }catch(e){ console.warn('Downloads não lidos do PPR:', e); } }   /* sem eles, só a contagem fica zerada */
   iniciar();
   if(erro) toast('Não foi possível ler os dados do PPR ('+htm(erro.message)+'). Nada do que você fizer agora será salvo — recarregue a página.','err');
   else gravarPessoa().catch(()=>{});

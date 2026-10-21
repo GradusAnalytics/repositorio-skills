@@ -1374,7 +1374,7 @@ function irView(v){ VIEW=v; render(); window.scrollTo({top:0,behavior:'smooth'})
 function notaHTML(x){
   const M=EST_META[x.est], C=catDe(x.c), desc=x.esc||x.uso||x.out||x.ex||x.com||x.obs;
   const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
-  let acoes = `${temPacote(x) ? btnPacote(x,'btn-dl') : linkExterno(x) ? btnAcessar(x,'btn-dl') : `<button class="btn-dl" onclick="baixarMd(${x.id})"><svg class="gi"><use href="#i-dl"/></svg> Baixar .md</button>`}
+  let acoes = `${temPacote(x) ? btnPacote(x,'btn-dl') : linkExterno(x) ? btnAcessar(x,'btn-dl') : `<button class="btn-dl" onclick="baixarMd(${x.id})"><svg class="gi"><use href="#i-dl"/></svg> Baixar Skill</button>`}
                <button class="btn-gh" onclick="abrirDet(${x.id})">Ver ficha</button>`;
   let flag='';
   if(x.status==='pendente') flag=`<div class="pit-flag"><svg class="gi"><use href="#i-clock"/></svg> <b>Aguardando aprovação</b> da Gestão Metodológica · sugerida por ${htm(pessoaTxt(x.criador))} em ${htm(x.criado)}${x.demo?' · <b>exemplo de demonstração</b>':''}</div>`;

@@ -1374,7 +1374,7 @@ function irView(v){ VIEW=v; render(); window.scrollTo({top:0,behavior:'smooth'})
 function notaHTML(x){
   const M=EST_META[x.est], C=catDe(x.c), desc=x.esc||x.uso||x.out||x.ex||x.com||x.obs;
   const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
-  let acoes = `${temPacote(x) ? btnPacote(x,'btn-dl') : linkExterno(x) ? btnAcessar(x,'btn-dl') : `<button class="btn-dl" onclick="baixarMd(${x.id})"><svg class="gi"><use href="#i-dl"/></svg> Baixar Skill</button>`}
+  let acoes = `${temPacote(x) ? btnPacote(x,'btn-dl') : temAnexo(x) ? btnAnexo(x,'btn-dl') : linkExterno(x) ? btnAcessar(x,'btn-dl') : `<button class="btn-dl" onclick="baixarMd(${x.id})"><svg class="gi"><use href="#i-dl"/></svg> Baixar Skill</button>`}
                <button class="btn-gh" onclick="abrirDet(${x.id})">Ver ficha</button>`;
   let flag='';
   if(x.status==='pendente') flag=`<div class="pit-flag"><svg class="gi"><use href="#i-clock"/></svg> <b>Aguardando aprovação</b> da Gestão Metodológica · sugerida por ${htm(pessoaTxt(x.criador))} em ${htm(x.criado)}${x.demo?' · <b>exemplo de demonstração</b>':''}</div>`;
@@ -1728,6 +1728,9 @@ function linkExterno(x){ return x.f==='ext' && /^https?:\/\//i.test(x.repo||'') 
 /* pacote da versão atual no repositório de conteúdo (gravado pela API do PPR em historico[].pacote) */
 function temPacote(x){ const h=(x.historico||[]).find(e=>e.versao===x.versao); return !!(h && h.pacote && h.pacote.tag); }
 function btnPacote(x, cls){ return '<button class="'+cls+'" onclick="baixarPacote('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar skill (.zip)</button>'; }
+/* arquivo enviado pelo formulário na versão atual (fica na própria ficha, sem pacote no repositório de conteúdo) */
+function temAnexo(x){ const h=(x.historico||[]).find(e=>e.versao===x.versao); return !!(h && h.arquivo && (h.arquivo.blob || h.arquivo.dataUrl)); }
+function btnAnexo(x, cls){ return '<button class="'+cls+'" onclick="baixarArqVersao('+x.id+','+x.versao+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar Skill</button>'; }
 async function baixarPacote(id, versao){
   if(!PPR_ORIGEM){ toast('O pacote da skill só baixa com a ferramenta aberta pelo PPR.','warn'); return; }
   try{
@@ -2055,7 +2058,7 @@ function fichaHTML(x){
 function fichaFooter(x){
   const podeEditar = isAdmin() || (x.status!=='aprovada' && x.autorEmail===USUARIO.email);
   const emAnalise = !!(x.proposta && x.proposta.status==='pendente');
-  let ft = (temPacote(x) ? btnPacote(x,'btn-p') + (linkExterno(x) ? btnAcessar(x,'btn-s') : '')
+  let ft = (temPacote(x) || temAnexo(x) ? (temPacote(x) ? btnPacote(x,'btn-p') : btnAnexo(x,'btn-p')) + (linkExterno(x) ? btnAcessar(x,'btn-s') : '')
             + '<button class="btn-s" onclick="baixarMd('+x.id+')">Baixar ficha .md</button>'
           : linkExterno(x) ? btnAcessar(x,'btn-p') : '<button class="btn-p" onclick="baixarMd('+x.id+')"><svg class="gi"><use href="#i-dl"/></svg> Baixar ficha .md</button>')
          + '<button class="btn-s" onclick="prevMd('+x.id+')" id="btn-prev">Ver conteúdo do .md</button>'
